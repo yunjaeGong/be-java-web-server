@@ -1,15 +1,16 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RequestHandler implements Runnable {
+
+    private static final String DEFAULT_PATH = "/Users/rentalhub-mac88/Desktop/Softeer/be-java-web-server/src/main/resources/";
+    private static final String TEMPLATES_PATH = "/templates";
+    private static final String STATIC_PATH = "/static";
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
@@ -22,10 +23,39 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
+        byte[] body = null;
+        FileInputStream uri = null;
+        StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
+
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String[] header = br.readLine().split(" ");
+
+            String methodType = header[0];
+            String path = header[1];
+            String httpVersion = header[2];
+            logger.debug("request path: " + path);
+
+            if(path.contains("html")) {
+                resourcePath.append(TEMPLATES_PATH);
+            } else {
+                resourcePath.append(STATIC_PATH);
+            }
+
+            resourcePath.append(path);
+
+            // TODO: Controller 구현
+            try {
+                 uri = new FileInputStream(resourcePath.toString());
+                body = uri.readAllBytes();
+            } catch (FileNotFoundException e) {
+                logger.error("Error while reading requested uri", e);
+            }
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "Hello World".getBytes();
+
+            assert body!= null;
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
