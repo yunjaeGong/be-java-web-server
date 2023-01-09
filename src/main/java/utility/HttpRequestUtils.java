@@ -12,7 +12,6 @@ public class HttpRequestUtils {
 
     public static Map<String, String> parseQueryString(String queryString)  {
         String[] queries = queryString.split("\\?");
-        String path = queries[0];
 
         if(queries.length < 2)
             return null;
