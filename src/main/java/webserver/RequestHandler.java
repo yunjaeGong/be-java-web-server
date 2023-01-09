@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class RequestHandler implements Runnable {
             String[] header = br.readLine().split(" ");
 
             String methodType = header[0];
-            String path = header[1];
+            String path = header[1];  // TODO: QuerySting parameter parsing 기능 추가
             String httpVersion = header[2];
             logger.debug("request path: " + path);
 
@@ -46,8 +47,7 @@ public class RequestHandler implements Runnable {
 
             // TODO: Controller 구현
             try {
-                 uri = new FileInputStream(resourcePath.toString());
-                body = uri.readAllBytes();
+                body = Files.readAllBytes(new File(resourcePath.toString()).toPath());
             } catch (FileNotFoundException e) {
                 logger.error("Error while reading requested uri", e);
             }
