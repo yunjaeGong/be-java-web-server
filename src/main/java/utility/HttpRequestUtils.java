@@ -10,17 +10,9 @@ public class HttpRequestUtils {
     public static final String HTTP_VERSION = "httpVersion";
     public static final String PATH = "path";
     public static final String QUERY_STRING = "queryString";
-    /*
-    QueryStringParam 파싱 지원하는 클래스
-     */
 
     public static Map<String, String> parseQueryString(String queryString)  {
-        String[] queries = queryString.split("\\?");
-
-        if(queries.length < 2)
-            return null;
-
-        String[] params = queries[1].split("&");
+        String[] params = queryString.split("&");
 
         if(params.length == 0)
             return null;
@@ -38,7 +30,8 @@ public class HttpRequestUtils {
 
         String[] queries = queryPath.split("\\?");
         requestResources.put(PATH, queries[0]);
-        requestResources.put(QUERY_STRING, queries[1]);
+        if(queries.length == 2)
+            requestResources.put(QUERY_STRING, queries[1]);
 
         return requestResources;
     }
