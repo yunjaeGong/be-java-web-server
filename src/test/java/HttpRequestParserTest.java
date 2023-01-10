@@ -12,18 +12,34 @@ public class HttpRequestParserTest {
     private static final String DEFAULT_PATH = "/Users/rentalhub-mac88/Desktop/Softeer/be-java-web-server/src/main/resources";
 
     @Test
-    public void Given_EmptyUrl_When_parseRequestUri_Then_IndexHtml() throws IOException {
+    public void Given_RootUrl_When_parseRequestUrl_Then_RootUrl() throws IOException {
         // given
-        String request = "GET / HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*";
+        String request = "GET / HTTP/1.1 \r\n" +
+                "Host: localhost:8080 \r\n" +
+                "Connection: keep-alive \r\n" +
+                "Accept: */* \r\n";
 
         // when
         HttpRequestParser parser = new HttpRequestParser(new ByteArrayInputStream(request.getBytes()));
 
         // then
         assertNotNull(parser);
-        assertEquals(DEFAULT_PATH + "/templates/index.html", parser.path);
+        assertEquals("/", parser.path);
+    }
+
+    @Test
+    public void Given_IndexHtml_When_parseRequestUrl_Then_IndexHtml() throws IOException {
+        // given
+        String request = "GET /index.html HTTP/1.1 \r\n" +
+                "Host: localhost:8080 \r\n" +
+                "Connection: keep-alive \r\n" +
+                "Accept: */* \r\n";
+
+        // when
+        HttpRequestParser parser = new HttpRequestParser(new ByteArrayInputStream(request.getBytes()));
+
+        // then
+        assertNotNull(parser);
+        assertEquals("/index.html", parser.path);
     }
 }
