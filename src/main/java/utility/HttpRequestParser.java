@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class HttpRequestParser {
     /*
@@ -19,6 +18,8 @@ public class HttpRequestParser {
     private static final String STATIC_PATH = "/static";
 
     private final StringBuilder resourcePath;
+
+    private final Map<String, String> route = new HashMap<>();
 
     private String methodType;
     public String path;
@@ -33,36 +34,31 @@ public class HttpRequestParser {
 
         this.methodType = header[0];
         this.httpVersion = header[2];
+        String[] queries = queryPath.split("\\?");
+        this.path = queries[0];
 
-        this.path = queryPath.split("\\?")[0];
+        if(queries.length > 1)
+            parseQueryStringParams(queries[1]);
 
-
-        if(path.equals("/"))  // TODO: redirect하기
-            path = "/index.html";
-
-        parseQueryStringParams(path);
-
-        if(path.contains("html") || path.contains("favicon")) {
-            resourcePath.append(TEMPLATES_PATH);
-        } else {
-            resourcePath.append(STATIC_PATH);
-        }
-
-        resourcePath.append(path);
-
-        return resourcePath.toString();
+        return path;
     }
 
     private void parseQueryStringParams(String queryString) {
-        this.params = HttpRequestUtils.parseQueryString(queryString);
+        Map<String, String> parsedQueryString = HttpRequestUtils.parseQueryString(queryString);
+        if(parsedQueryString != null)
+            this.params.putAll(parsedQueryString);
     }
 
     public Map<String, String> getParams() {
-        return new HashMap<>(this.params);
+        return this.params;
     }
 
     public HttpRequestParser(InputStream requestHeader) throws IOException {
+        this.params = new HashMap<>();
         this.resourcePath = new StringBuilder(DEFAULT_PATH);
         this.path = parseRequestUri(requestHeader);
+
+        this.route.put("html", TEMPLATES_PATH);
+        this.route.put("favicon", TEMPLATES_PATH);
     }
 }
