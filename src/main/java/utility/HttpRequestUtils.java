@@ -14,7 +14,7 @@ public class HttpRequestUtils {
     public static Map<String, String> parseQueryString(String queryString)  {
         String[] params = queryString.split("&");
 
-        if(params.length == 0)
+        if(params.length == 0 || params[0].isBlank())
             return null;
 
         return Stream.of(params).map((param) -> param.split("=")).collect(Collectors.toMap(a->a[0], a->a[1]));
