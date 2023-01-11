@@ -72,7 +72,10 @@ public class RequestController {
         }
         resourcePath.append(path);
 
-        return resourcePath.toString();
+        String contentType = Files.probeContentType(Path.of(path));
+        logger.debug("contentType: " +contentType);
+
+        return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
     public static String dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
@@ -95,6 +98,9 @@ public class RequestController {
             // TODO: Redirect Response 보내기
         }
 
-        return "dynamic";  // TODO: HttpResponse 반환
+        String contentType = Files.probeContentType(Path.of(path));
+        logger.debug("contentType: " +contentType);
+
+        return new HttpResponse(path, status, header, contentType);
     }
 }
