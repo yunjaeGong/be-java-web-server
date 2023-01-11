@@ -6,10 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.HttpRequestParser;
 import utility.HttpResponse;
+import utility.HttpStatusCode;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class RequestController {
@@ -18,17 +21,16 @@ public class RequestController {
     정적 리소스는 단순 서빙
     동적 리소스의 경우 Redirect, 비즈니스 로직 처리 등 수행
     */
-
-    private static final Logger logger = LoggerFactory.getLogger(RequestController.class);
-
     public static final String DEFAULT_PATH = "./src/main/resources";
     public static final String TEMPLATES_PATH = "/templates";
     public static final String STATIC_PATH = "/static";
+    private static final Logger logger = LoggerFactory.getLogger(RequestController.class);
 
     private static final int DYNAMIC = 1;
     private static final int STATIC = 2;
 
     private static final List<String> staticResource = new ArrayList<>(Arrays.asList("js", "html", "css", "font", "woff"));
+
     public Map<String, Integer> resources;
 
     private static RequestController controller = null;
@@ -48,7 +50,7 @@ public class RequestController {
     }
 
     // TODO: HttpResponse 반환하게
-    public static String requestController(String resourcePath) throws IOException {
+    public static HttpResponse requestController(String resourcePath) throws IOException {
         HttpRequestParser requestParser = new HttpRequestParser(resourcePath);
         String path = requestParser.path;
 
@@ -61,8 +63,23 @@ public class RequestController {
 
     }
 
+    public static HttpResponse requestController(InputStream in) throws IOException {
+        HttpRequestParser requestParser = new HttpRequestParser(in);
+        String path = requestParser.path;
+
+        logger.debug("Request Path: " + path);
+
+        String[] args = path.split("\\.");
+
+        if(args.length >= STATIC)  // .min.js, .js, .html , .ico
+            return staticResourceController(requestParser.path);
+        else
+            return dynamicResourceController(requestParser.path, requestParser);
+
+    }
+
     // TODO: HttpResponse 반환하게
-    public static String staticResourceController(String path) {
+    public static HttpResponse staticResourceController(String path) throws IOException {
         StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
 
         if(path.contains("html") || path.contains(".ico")) {
@@ -72,14 +89,21 @@ public class RequestController {
         }
         resourcePath.append(path);
 
-        return resourcePath.toString();
+        String contentType = Files.probeContentType(Path.of(path));
+        logger.debug("contentType: " +contentType);
+
+        return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static String dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
+    public static HttpResponse dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
+        // HttpResponse response = NotFoundResponse;
+        Map<String, String> header = new HashMap<>();
+        HttpStatusCode status = HttpStatusCode.NOT_FOUND;
 
-
-        if(path.equals("/"))
-            path = "/index.html"; // TODO: Redirect Response 보내기
+        if(path.equals("/")) {
+            path = "/index.html";
+            status = HttpStatusCode.OK;
+        }
 
         if(path.contains("/create") && parser.hasParams()) {
             Map<String, String> params = parser.getParams();
@@ -90,11 +114,18 @@ public class RequestController {
                     .setName(params.get("name"))
                     .setEmail(params.get("email")).build();
 
+            // TODO: UserService로 분리
             Database.addUser(user);
+
             logger.debug("created User: {}", Database.findUserById(params.get("userId")));
-            // TODO: Redirect Response 보내기
+
+            path = "";
+            header.put("Location", "/index.html");
         }
 
-        return "dynamic";  // TODO: HttpResponse 반환
+        String contentType = Files.probeContentType(Path.of(path));
+        logger.debug("contentType: " +contentType);
+
+        return new HttpResponse(path, status, header, contentType);
     }
 }
