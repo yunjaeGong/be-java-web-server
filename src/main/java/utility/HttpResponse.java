@@ -2,6 +2,8 @@ package utility;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,46 +19,43 @@ public class HttpResponse {
 
     private Map<String, String> header;
             
-    public HttpResponse(String resourcePath, HttpStatusCode statusCode, Map<String, String> header) {
+    public HttpResponse(String resourcePath, HttpStatusCode statusCode, Map<String, String> header, String contentType) {
         this.statusCode = statusCode;
         this.resourcePath = resourcePath;
         this.header = header;
+        this.contentType = contentType;  // TODO: contentType = null일 때 e.g., woff 예외처리 필요
     }
 
-    public HttpResponse(String resourcePath, HttpStatusCode statusCode) {
-        this(resourcePath, statusCode, new HashMap<>());
+    public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType) {
+        this(resourcePath, statusCode, new HashMap<>(), contentType);
     }
 
-    public String of() throws IOException {
-        final String NEXT_LINE = " \r\n";
-        byte[] body = "".getBytes();
+    public DataOutputStream of(DataOutputStream dos) throws IOException {
+        byte[] body = null;
 
         if(!resourcePath.isBlank()) {
             try {
-                body = Files.readAllBytes(new File(resourcePath.toString()).toPath());
+                body = Files.readAllBytes(new File(resourcePath).toPath());
             } catch (IOException e) {
                 logger.error("cannot open file: " + e.getMessage());
             }
         }
 
-        StringBuilder sb = new StringBuilder(String.format("%s %s \r\n", "HTTP/1.1", statusCode.toString()));
-        sb.append("Content-Type: text/" + contentType + ";charset=utf-8 \r\n");
-        sb.append("Content-Length: " + body.length + " \r\n");
+        dos.writeBytes(String.format("%s %s \r\n", "HTTP/1.1", statusCode.toString()));
+        dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8 \r\n");
+        dos.writeBytes("Content-Length: " + body.length + " \r\n");
 
         // StatusCode specific header
         for(Map.Entry<String, String> header : header.entrySet()) {
             String key = header.getKey();
             String val = header.getValue();
 
-            sb.append(key).append(": ").append(val).append(" \r\n");
+            dos.writeBytes(key + ": " + val + " \r\n");
         }
+        dos.writeBytes("\r\n");
 
-        responseBody(body, sb);
+        dos.write(body, 0, body.length);
 
-        return sb.toString();
-    }
-
-    private void responseBody(byte[] body, StringBuilder sb) {
-        sb.append(body);
+        return dos;
     }
 }
