@@ -80,7 +80,7 @@ public class RequestHandler implements Runnable {
             assert body!= null;
 
             if(path.contains("/create") && requestParser.hasParams()) {
-                response303Header(dos, 0, getContentType(path));
+                response302Header(dos, 0, getContentType(path));
             } else {
                 response200Header(dos, body.length, getContentType(path));
             }
@@ -112,9 +112,9 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response303Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
+    private void response302Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
-            dos.writeBytes("HTTP/1.1 303 SEE OTHER \r\n");
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
             dos.writeBytes("Location: /index.html \r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
