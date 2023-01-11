@@ -6,11 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
+
+import static utility.HttpRequestUtils.*;
 
 public class HttpRequestParser {
     /*
-      1. connection.inputStream으로 주어진 http request header를 parsing
+      1. connection.inputStream으로 주어진 http requestLine parsing
       2. 요청 uri에 QueryString 포함 여부 체크
       3. uri 자원의 파일 타입에 따라 html -> templates / 이외 js, css, pont -> /static으로 라우팅
      */
@@ -20,49 +21,63 @@ public class HttpRequestParser {
 
     private final StringBuilder resourcePath;
 
+    private final Map<String, String> route = new HashMap<>();
+
     private String methodType;
     public String path;
     public String httpVersion;
     private Map<String, String> params;
 
-    private String parseRequestUri(InputStream requestHeader) throws IOException {
+    private String parseRequestLine(InputStream requestHeader) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(requestHeader));
+        String requestLine = br.readLine();
 
-        String[] header = br.readLine().split(" ");
-        String queryPath = header[1];
+        return parseRequestLine(requestLine);
+    }
 
-        this.methodType = header[0];
-        this.httpVersion = header[2];
+    private String parseRequestLine(String requestHeader) {
+        Map<String, String> parsedHeader = HttpRequestUtils.parseRequestLine(requestHeader);
 
-        this.path = queryPath.split("\\?")[0];
+        this.path = parsedHeader.get(PATH);
+        this.methodType = parsedHeader.get(METHOD_TYPE);
+        this.httpVersion = parsedHeader.get(HTTP_VERSION);
+        String queryString = parsedHeader.get(QUERY_STRING);
 
+        if(queryString != null && !queryString.isEmpty())
+            parseQueryStringParams(queryString);
 
-        if(path.equals("/"))  // TODO: redirect하기
-            path = "/index.html";
-
-        parseQueryStringParams(path);
-
-        if(path.contains("html") || path.contains("favicon")) {
-            resourcePath.append(TEMPLATES_PATH);
-        } else {
-            resourcePath.append(STATIC_PATH);
-        }
-
-        resourcePath.append(path);
-
-        return resourcePath.toString();
+        return path;
     }
 
     private void parseQueryStringParams(String queryString) {
-        this.params = HttpRequestUtils.parseQueryString(queryString);
+        Map<String, String> parsedQueryString = HttpRequestUtils.parseQueryString(queryString);
+        if(parsedQueryString != null)
+            this.params.putAll(parsedQueryString);
     }
 
     public Map<String, String> getParams() {
         return new HashMap<>(this.params);
     }
 
+    public boolean hasParams() {
+        return this.params.size() > 0;
+    }
+
     public HttpRequestParser(InputStream requestHeader) throws IOException {
+        this.params = new HashMap<>();
         this.resourcePath = new StringBuilder(DEFAULT_PATH);
-        this.path = parseRequestUri(requestHeader);
+        this.path = this.parseRequestLine(requestHeader);
+
+        this.route.put("html", TEMPLATES_PATH);
+        this.route.put("favicon", TEMPLATES_PATH);
+    }
+
+    public HttpRequestParser(String requestHeader) {
+        this.params = new HashMap<>();
+        this.resourcePath = new StringBuilder(DEFAULT_PATH);
+        this.path = this.parseRequestLine(requestHeader);
+
+        this.route.put("html", TEMPLATES_PATH);
+        this.route.put("favicon", TEMPLATES_PATH);
     }
 }
