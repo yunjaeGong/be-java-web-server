@@ -35,34 +35,6 @@ public class RequestController {
 
     private static RequestController controller = null;
 
-    private Map<String, String> route;
-    private RequestController() {
-        this.route = new HashMap<>();
-        resources = new HashMap<>();
-        resources = staticResource.stream().collect(Collectors.toMap(str -> str, str -> STATIC));
-    }
-
-    public static RequestController getInstance() {
-        if(controller == null) {
-            controller = new RequestController();
-        }
-        return controller;
-    }
-
-    // TODO: HttpResponse 반환하게
-    public static HttpResponse requestController(String resourcePath) throws IOException {
-        HttpRequestParser requestParser = new HttpRequestParser(resourcePath);
-        String path = requestParser.path;
-
-        String[] args = path.split("\\.");
-
-        if(args.length >= STATIC)  // .min.js, .js, .html , .ico
-            return staticResourceController(requestParser.path);
-        else
-            return dynamicResourceController(requestParser.path, requestParser);
-
-    }
-
     public static HttpResponse requestController(InputStream in) throws IOException {
         HttpRequestParser requestParser = new HttpRequestParser(in);
         String path = requestParser.path;
@@ -78,7 +50,6 @@ public class RequestController {
 
     }
 
-    // TODO: HttpResponse 반환하게
     public static HttpResponse staticResourceController(String path) throws IOException {
         StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
 
@@ -105,7 +76,7 @@ public class RequestController {
             status = HttpStatusCode.OK;
         }
 
-        if(path.contains("/create") && parser.hasParams()) {
+        if(path.equals("/user/create") && parser.hasParams()) {
             Map<String, String> params = parser.getParams();
 
             User user = User.UserBuilder.builder()
