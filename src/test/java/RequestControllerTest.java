@@ -6,6 +6,7 @@ import controller.RequestController;
 import utility.HttpStatusCode;
 import webserver.RequestHandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,7 +23,7 @@ public class RequestControllerTest {
         HttpResponse result = null;
 
         try {
-            result = RequestController.requestController(resource);
+            result = RequestController.requestController(new ByteArrayInputStream(resource.getBytes()));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -37,7 +38,7 @@ public class RequestControllerTest {
         HttpResponse result = null;
 
         try {
-            result = RequestController.requestController(resource);
+            result = RequestController.requestController(new ByteArrayInputStream(resource.getBytes()));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
