@@ -1,20 +1,17 @@
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import dto.HttpResponse;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utility.HttpRequestParser;
-import utility.HttpRequestUtils;
-import webserver.RequestController;
+import controller.RequestController;
+import utility.HttpStatusCode;
 import webserver.RequestHandler;
 
 import java.io.IOException;
-import java.io.PrintStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static webserver.RequestController.DEFAULT_PATH;
-import static webserver.RequestController.TEMPLATES_PATH;
+import static controller.RequestController.DEFAULT_PATH;
+import static controller.RequestController.TEMPLATES_PATH;
 
 public class RequestControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -22,7 +19,7 @@ public class RequestControllerTest {
     @Test
     public void Given_StaticResourceString_When_RequestController_Then_PathToResource() {
         String resource = "GET /index.html HTTP/1.1";
-        String result = null;
+        HttpResponse result = null;
 
         try {
             result = RequestController.requestController(resource);
@@ -31,13 +28,13 @@ public class RequestControllerTest {
         }
 
         assertNotNull(result);
-        assertEquals(DEFAULT_PATH + TEMPLATES_PATH + "/index.html", result);
+        assertEquals(DEFAULT_PATH + TEMPLATES_PATH + "/index.html", result.resourcePath);
     }
 
     @Test
     public void Given_DynamicResourceString_When_RequestController_Then_PathToResource() {
         String resource = "GET /user/create?userId=asdf&email=asdf@naver.com&password=1234&name=asdf HTTP/1.1 \r\n";
-        String result = null;
+        HttpResponse result = null;
 
         try {
             result = RequestController.requestController(resource);
@@ -46,6 +43,6 @@ public class RequestControllerTest {
         }
 
         assertNotNull(result);
-        assertEquals("dynamic", result);
+        assertEquals(HttpStatusCode.FOUND, result.statusCode);
     }
 }
