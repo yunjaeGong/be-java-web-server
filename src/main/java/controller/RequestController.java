@@ -96,9 +96,9 @@ public class RequestController {
     }
 
     public static HttpResponse dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
-        // HttpResponse response = NotFoundResponse;
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
+        String contentType = "text/html";
 
         if(path.equals("/")) {
             path = "/index.html";
@@ -120,10 +120,12 @@ public class RequestController {
             logger.debug("created User: {}", Database.findUserById(params.get("userId")));
 
             path = "";
+            status = HttpStatusCode.FOUND;
             header.put("Location", "/index.html");
         }
 
-        String contentType = Files.probeContentType(Path.of(path));
+        if(!path.isBlank())
+            contentType = Files.probeContentType(Path.of(path));
         logger.debug("contentType: " +contentType);
 
         return new HttpResponse(path, status, header, contentType);
