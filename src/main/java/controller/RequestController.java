@@ -1,11 +1,11 @@
-package webserver;
+package controller;
 
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.HttpRequestParser;
-import utility.HttpResponse;
+import dto.HttpResponse;
 import utility.HttpStatusCode;
 
 import java.io.IOException;
