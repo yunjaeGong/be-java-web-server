@@ -3,9 +3,10 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import controller.RequestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utility.HttpResponse;
+import dto.HttpResponse;
 
 public class RequestHandler implements Runnable {
 
