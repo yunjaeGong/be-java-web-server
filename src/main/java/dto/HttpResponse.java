@@ -32,7 +32,7 @@ public class HttpResponse {
     }
 
     public DataOutputStream of(DataOutputStream dos) throws IOException {
-        byte[] body = null;
+        byte[] body = "".getBytes();
 
         if(!resourcePath.isBlank()) {
             try {
