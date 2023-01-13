@@ -32,11 +32,7 @@ public class HttpRequestParser {
         BufferedReader br = new BufferedReader(new InputStreamReader(requestHeader));
         String requestLine = br.readLine();
 
-        return parseRequestLine(requestLine);
-    }
-
-    private String parseRequestLine(String requestHeader) {
-        Map<String, String> parsedHeader = HttpRequestUtils.parseRequestLine(requestHeader);
+        Map<String, String> parsedHeader = HttpRequestUtils.parseRequestLine(requestLine);
 
         this.path = parsedHeader.get(PATH);
         this.methodType = parsedHeader.get(METHOD_TYPE);
@@ -64,15 +60,6 @@ public class HttpRequestParser {
     }
 
     public HttpRequestParser(InputStream requestHeader) throws IOException {
-        this.params = new HashMap<>();
-        this.resourcePath = new StringBuilder(DEFAULT_PATH);
-        this.path = this.parseRequestLine(requestHeader);
-
-        this.route.put("html", TEMPLATES_PATH);
-        this.route.put("favicon", TEMPLATES_PATH);
-    }
-
-    public HttpRequestParser(String requestHeader) {
         this.params = new HashMap<>();
         this.resourcePath = new StringBuilder(DEFAULT_PATH);
         this.path = this.parseRequestLine(requestHeader);
