@@ -4,6 +4,7 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.UserService;
 import utility.HttpRequestParser;
 import dto.HttpResponse;
 import utility.HttpStatusCode;
@@ -85,14 +86,18 @@ public class RequestController {
                     .setName(params.get("name"))
                     .setEmail(params.get("email")).build();
 
-            // TODO: UserService로 분리
-            Database.addUser(user);
-
-            logger.debug("created User: {}", Database.findUserById(params.get("userId")));
-
             path = "";
             status = HttpStatusCode.FOUND;
             header.put("Location", "/index.html");
+
+            try {
+                UserService.signUpUser(user);
+            } catch (IllegalStateException e) {
+                logger.error("/user/create - " + e.getMessage());
+                header.put("Location", "/user/form.html");
+            }
+
+            logger.debug("created User: {}", Database.findUserById(params.get("userId")));
         }
 
         if(!path.isBlank())
