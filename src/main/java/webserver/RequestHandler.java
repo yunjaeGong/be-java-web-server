@@ -3,15 +3,12 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import controller.RequestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utility.HttpResponse;
+import dto.HttpResponse;
 
 public class RequestHandler implements Runnable {
-
-    private static final String DEFAULT_PATH = "/Users/rentalhub-mac88/Desktop/Softeer/be-java-web-server/src/main/resources";
-    private static final String TEMPLATES_PATH = "/templates";
-    private static final String STATIC_PATH = "/static";
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
