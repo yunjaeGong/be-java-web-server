@@ -8,7 +8,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class UserServiceTest {
-    private static UserService userService = new UserService();
 
     @BeforeEach
     private void cleanUpDatabase() {
@@ -21,10 +20,10 @@ public class UserServiceTest {
         User user1 = new User.UserBuilder().setUserId("aaaa").setName("bbbb").setEmail("aaaa.gmail.com").setPassword("1234").build();
         User user2 = new User.UserBuilder().setUserId("aaaa").setName("bbbb").setEmail("aaaa.gmail.com").setPassword("1234").build();
 
-        userService.signUpUser(user1);
+        UserService.signUpUser(user1);
 
         // when
-        assertThatThrownBy(() -> userService.signUpUser(user2)).isInstanceOf(IllegalStateException.class)
+        assertThatThrownBy(() -> UserService.signUpUser(user2)).isInstanceOf(IllegalStateException.class)
                 // then
                 .hasMessageContaining("중복된 아이디입니다.");
     }
@@ -35,7 +34,7 @@ public class UserServiceTest {
         User user1 = new User.UserBuilder().setUserId("aaaa").setName("bbbb").setEmail("aaaa.gmail.com").setPassword("1234").build();
 
         // when
-        assertThatThrownBy(() -> userService.findUserById(user1.getUserId()))
+        assertThatThrownBy(() -> UserService.findUserById(user1.getUserId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 // then
                 .hasMessageContaining("해당 유저가 존재하지 않습니다.");
@@ -47,10 +46,10 @@ public class UserServiceTest {
         User user1 = new User.UserBuilder().setUserId("aaaa").setName("bbbb").setEmail("aaaa.gmail.com").setPassword("1234").build();
 
         // when
-        userService.signUpUser(user1);
+        UserService.signUpUser(user1);
 
         // then
-        assertThat(userService.findUserById(user1.getUserId()))
+        assertThat(UserService.findUserById(user1.getUserId()))
                 .isInstanceOf(User.class)
                 .isEqualTo(user1);
     }
