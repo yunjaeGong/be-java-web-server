@@ -23,4 +23,8 @@ public class Database {
     public static Optional<Collection<User>> findAll() {
         return Optional.of(users.values());
     }
+
+    public static void clear() {
+        users = new HashMap<>();
+    }
 }
