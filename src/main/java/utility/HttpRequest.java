@@ -54,12 +54,12 @@ public class HttpRequest {
     private void parseRequestLine() throws IOException {
         String requestLine = request.readLine();
 
-        Map<String, String> parsedHeader = HttpRequestUtils.parseRequestLine(requestLine);
+        Map<String, String> parsedRequestLine = HttpRequestUtils.parseRequestLine(requestLine);
 
-        this.path = parsedHeader.get(PATH);
-        this.methodType = parsedHeader.get(METHOD_TYPE);
-        this.httpVersion = parsedHeader.get(HTTP_VERSION);
-        String queryString = parsedHeader.get(QUERY_STRING);
+        this.path = parsedRequestLine.get(PATH);
+        this.methodType = parsedRequestLine.get(METHOD_TYPE);
+        this.httpVersion = parsedRequestLine.get(HTTP_VERSION);
+        String queryString = parsedRequestLine.get(QUERY_STRING);
 
         if(queryString != null && !queryString.isEmpty())
             parseQueryStringParams(queryString);
