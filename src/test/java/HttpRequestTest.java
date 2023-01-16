@@ -1,6 +1,7 @@
 import db.Database;
 import dto.HttpResponse;
 import model.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,10 @@ public class HttpRequestTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestTest.class);
 
+    @BeforeEach
+    private void cleanUpDatabase() {
+        Database.clear();
+    }
 
     @Test
     public void Given_RootUrl_When_parseRequestUrl_Then_RootUrl() throws IOException {
