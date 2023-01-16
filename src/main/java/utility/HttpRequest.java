@@ -60,13 +60,18 @@ public class HttpRequest {
     }
 
     private void parseRequestBody() throws IOException {
-        String line = this.request.readLine();
+        int bodyLen = 0;
+        this.body = "";
 
-        if(line == null || line.isBlank()) {
-            this.body = "";
+        if(this.requestHeader.containsKey("Content-Length")) {
+            bodyLen = Integer.parseInt(this.requestHeader.get("Content-Length"));
+        }
+        StringBuilder sb = new StringBuilder();
+        while(this.request.ready()) {
+            sb.append((char)this.request.read());
         }
 
-        this.body = line.trim();
+        this.body = sb.toString();
     }
 
     private void parseQueryStringParams(String queryString) {
