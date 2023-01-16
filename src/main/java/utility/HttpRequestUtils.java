@@ -1,5 +1,7 @@
 package utility;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +20,22 @@ public class HttpRequestUtils {
             return null;
 
         return Stream.of(params).map((param) -> param.split("=")).collect(Collectors.toMap(a->a[0], a->a[1]));
+    }
+
+    public static Map<String, String> parseRequestHeader(BufferedReader request) throws IOException {
+        String line = request.readLine();
+        Map<String, String> headers = new HashMap<>();
+
+        while(!(line == null || line.isBlank())) {
+            String[] kv = line.split(":", 2);
+            String key = kv[0];
+            String val = kv[1].trim();
+
+            headers.put(key, val);
+            line = request.readLine();
+        }
+
+        return headers;
     }
 
     public static Map<String, String> parseRequestLine(String requestHeader) {
