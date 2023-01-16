@@ -5,7 +5,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
-import utility.HttpRequest;
+import dto.HttpRequest;
 import dto.HttpResponse;
 import utility.HttpRequestUtils;
 import utility.HttpStatusCode;

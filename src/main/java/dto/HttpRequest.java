@@ -1,4 +1,6 @@
-package utility;
+package dto;
+
+import utility.HttpRequestUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

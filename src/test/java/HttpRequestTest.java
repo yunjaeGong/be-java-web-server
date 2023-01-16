@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
-import utility.HttpRequest;
+import dto.HttpRequest;
 import utility.HttpRequestUtils;
 import utility.HttpStatusCode;
 
@@ -13,13 +13,11 @@ import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.*;
-import static utility.HttpRequestUtils.parseQueryString;
 
 public class HttpRequestTest {
 
