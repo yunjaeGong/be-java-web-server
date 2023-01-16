@@ -9,13 +9,13 @@ import java.util.Map;
 
 import static utility.HttpRequestUtils.*;
 
-public class HttpRequestParser {
+public class HttpRequest {
     /*
       1. connection.inputStream으로 주어진 http requestLine parsing
       2. 요청 uri에 QueryString 포함 여부 체크
       3. uri 자원의 파일 타입에 따라 html -> templates / 이외 js, css, pont -> /static으로 라우팅
      */
-    private static final String DEFAULT_PATH = "/Users/rentalhub-mac88/Desktop/Softeer/be-java-web-server/src/main/resources";
+    private static final String DEFAULT_PATH = "./src/main/resources";  // TODO: JVM ClassLoader 기준 경로로 변경
     private static final String TEMPLATES_PATH = "/templates";
     private static final String STATIC_PATH = "/static";
 
@@ -27,6 +27,23 @@ public class HttpRequestParser {
     public String path;
     public String httpVersion;
     private Map<String, String> params;
+
+    public HttpRequest(InputStream requestHeader) throws IOException {
+        this.params = new HashMap<>();
+        this.resourcePath = new StringBuilder(DEFAULT_PATH);
+        this.path = this.parseRequestLine(requestHeader);
+
+        this.route.put("html", TEMPLATES_PATH);
+        this.route.put("favicon", TEMPLATES_PATH);
+    }
+
+    public Map<String, String> getParams() {
+        return new HashMap<>(this.params);
+    }
+
+    public boolean hasParams() {
+        return this.params.size() > 0;
+    }
 
     private String parseRequestLine(InputStream requestHeader) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(requestHeader));
@@ -49,22 +66,5 @@ public class HttpRequestParser {
         Map<String, String> parsedQueryString = HttpRequestUtils.parseQueryString(queryString);
         if(parsedQueryString != null)
             this.params.putAll(parsedQueryString);
-    }
-
-    public Map<String, String> getParams() {
-        return new HashMap<>(this.params);
-    }
-
-    public boolean hasParams() {
-        return this.params.size() > 0;
-    }
-
-    public HttpRequestParser(InputStream requestHeader) throws IOException {
-        this.params = new HashMap<>();
-        this.resourcePath = new StringBuilder(DEFAULT_PATH);
-        this.path = this.parseRequestLine(requestHeader);
-
-        this.route.put("html", TEMPLATES_PATH);
-        this.route.put("favicon", TEMPLATES_PATH);
     }
 }

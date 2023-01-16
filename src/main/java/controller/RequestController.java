@@ -5,7 +5,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.UserService;
-import utility.HttpRequestParser;
+import utility.HttpRequest;
 import dto.HttpResponse;
 import utility.HttpStatusCode;
 
@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RequestController {
     /*
@@ -37,7 +36,7 @@ public class RequestController {
     private static RequestController controller = null;
 
     public static HttpResponse requestController(InputStream in) throws IOException {
-        HttpRequestParser requestParser = new HttpRequestParser(in);
+        HttpRequest requestParser = new HttpRequest(in);
         String path = requestParser.path;
 
         logger.debug("Request Path: " + path);
@@ -67,7 +66,7 @@ public class RequestController {
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static HttpResponse dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
+    public static HttpResponse dynamicResourceController(String path, HttpRequest parser) throws IOException {
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";

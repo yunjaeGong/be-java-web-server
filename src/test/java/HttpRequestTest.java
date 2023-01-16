@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import utility.HttpRequestParser;
+import utility.HttpRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class HttpRequestParserTest {
+public class HttpRequestTest {
 
     private static final String DEFAULT_PATH = "/Users/rentalhub-mac88/Desktop/Softeer/be-java-web-server/src/main/resources";
 
@@ -20,7 +20,7 @@ public class HttpRequestParserTest {
                 "Accept: */* \r\n";
 
         // when
-        HttpRequestParser parser = new HttpRequestParser(new ByteArrayInputStream(request.getBytes()));
+        HttpRequest parser = new HttpRequest(new ByteArrayInputStream(request.getBytes()));
 
         // then
         assertNotNull(parser);
@@ -36,7 +36,7 @@ public class HttpRequestParserTest {
                 "Accept: */* \r\n";
 
         // when
-        HttpRequestParser parser = new HttpRequestParser(new ByteArrayInputStream(request.getBytes()));
+        HttpRequest parser = new HttpRequest(new ByteArrayInputStream(request.getBytes()));
 
         // then
         assertNotNull(parser);
