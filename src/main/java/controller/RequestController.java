@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import service.UserService;
 import utility.HttpRequest;
 import dto.HttpResponse;
+import utility.HttpRequestUtils;
 import utility.HttpStatusCode;
 
 import java.io.IOException;
@@ -76,8 +77,16 @@ public class RequestController {
             status = HttpStatusCode.OK;
         }
 
-        if(path.equals("/user/create") && parser.hasParams()) {
-            Map<String, String> params = parser.getParams();
+        if(path.equals("/user/create") && (parser.hasParams() || !parser.getBody().isEmpty())) {
+            Map<String, String> params = null;
+
+            if(!parser.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(parser.getBody());
+
+            if(parser.hasParams())
+                params = parser.getParams();
+
+            Objects.requireNonNull(params);
 
             User user = User.UserBuilder.builder()
                     .setUserId(params.get("userId"))
