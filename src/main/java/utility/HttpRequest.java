@@ -21,7 +21,7 @@ public class HttpRequest {
 
     private final StringBuilder resourcePath;
 
-    private final Map<String, String> route = new HashMap<>();
+    private Map<String, String> requestHeader = new HashMap<>();
     private final BufferedReader request;
 
     private String methodType;
@@ -37,18 +37,8 @@ public class HttpRequest {
         this.request = new BufferedReader(new InputStreamReader(request));
 
         this.parseRequestLine();
+        this.parseRequestHeader();
         this.parseRequestBody();
-
-        this.route.put("html", TEMPLATES_PATH);
-        this.route.put("favicon", TEMPLATES_PATH);
-    }
-
-    public Map<String, String> getParams() {
-        return new HashMap<>(this.params);
-    }
-
-    public boolean hasParams() {
-        return this.params.size() > 0;
     }
 
     private void parseRequestLine() throws IOException {
@@ -65,9 +55,12 @@ public class HttpRequest {
             parseQueryStringParams(queryString);
     }
 
+    private void parseRequestHeader() throws IOException {
+        this.requestHeader = HttpRequestUtils.parseRequestHeader(this.request);
+    }
+
     private void parseRequestBody() throws IOException {
         String line = this.request.readLine();
-        line = this.request.readLine();
 
         if(line == null || line.isBlank()) {
             this.body = "";
@@ -96,5 +89,13 @@ public class HttpRequest {
 
     public String getBody() {
         return body;
+    }
+
+    public Map<String, String> getParams() {
+        return new HashMap<>(this.params);
+    }
+
+    public boolean hasParams() {
+        return this.params.size() > 0;
     }
 }
