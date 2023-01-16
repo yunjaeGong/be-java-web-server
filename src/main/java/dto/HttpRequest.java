@@ -29,12 +29,12 @@ public class HttpRequest {
     private String methodType;
     private String path;
     private String httpVersion;
-    private Map<String, String> params;
+    private Map<String, String> queryString;
 
     private String body;
 
     public HttpRequest(InputStream request) throws IOException {
-        this.params = new HashMap<>();
+        this.queryString = new HashMap<>();
         this.resourcePath = new StringBuilder(DEFAULT_PATH);
         this.request = new BufferedReader(new InputStreamReader(request));
 
@@ -79,7 +79,7 @@ public class HttpRequest {
     private void parseQueryStringParams(String queryString) {
         Map<String, String> parsedQueryString = HttpRequestUtils.parseQueryString(queryString);
         if(parsedQueryString != null)
-            this.params.putAll(parsedQueryString);
+            this.queryString.putAll(parsedQueryString);
     }
 
     public String getMethodType() {
@@ -98,11 +98,11 @@ public class HttpRequest {
         return body;
     }
 
-    public Map<String, String> getParams() {
-        return new HashMap<>(this.params);
+    public Map<String, String> getQueryString() {
+        return new HashMap<>(this.queryString);
     }
 
     public boolean hasParams() {
-        return this.params.size() > 0;
+        return this.queryString.size() > 0;
     }
 }

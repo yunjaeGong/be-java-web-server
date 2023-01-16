@@ -84,7 +84,7 @@ public class RequestController {
                 params = HttpRequestUtils.parseQueryString(parser.getBody());
 
             if(parser.hasParams())
-                params = parser.getParams();
+                params = parser.getQueryString();
 
             Objects.requireNonNull(params);
 
