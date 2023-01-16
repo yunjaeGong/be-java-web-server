@@ -24,7 +24,7 @@ public class HttpRequestTest {
 
         // then
         assertNotNull(parser);
-        assertEquals("/", parser.path);
+        assertEquals("/", parser.getPath());
     }
 
     @Test
@@ -40,6 +40,6 @@ public class HttpRequestTest {
 
         // then
         assertNotNull(parser);
-        assertEquals("/index.html", parser.path);
+        assertEquals("/index.html", parser.getPath());
     }
 }

@@ -22,16 +22,22 @@ public class HttpRequest {
     private final StringBuilder resourcePath;
 
     private final Map<String, String> route = new HashMap<>();
+    private final BufferedReader request;
 
     private String methodType;
-    public String path;
-    public String httpVersion;
+    private String path;
+    private String httpVersion;
     private Map<String, String> params;
 
-    public HttpRequest(InputStream requestHeader) throws IOException {
+    private String body;
+
+    public HttpRequest(InputStream request) throws IOException {
         this.params = new HashMap<>();
         this.resourcePath = new StringBuilder(DEFAULT_PATH);
-        this.path = this.parseRequestLine(requestHeader);
+        this.request = new BufferedReader(new InputStreamReader(request));
+
+        this.parseRequestLine();
+        this.parseRequestBody();
 
         this.route.put("html", TEMPLATES_PATH);
         this.route.put("favicon", TEMPLATES_PATH);
@@ -45,9 +51,8 @@ public class HttpRequest {
         return this.params.size() > 0;
     }
 
-    private String parseRequestLine(InputStream requestHeader) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(requestHeader));
-        String requestLine = br.readLine();
+    private void parseRequestLine() throws IOException {
+        String requestLine = request.readLine();
 
         Map<String, String> parsedHeader = HttpRequestUtils.parseRequestLine(requestLine);
 
@@ -58,13 +63,38 @@ public class HttpRequest {
 
         if(queryString != null && !queryString.isEmpty())
             parseQueryStringParams(queryString);
+    }
 
-        return path;
+    private void parseRequestBody() throws IOException {
+        String line = this.request.readLine();
+        line = this.request.readLine();
+
+        if(line == null || line.isBlank()) {
+            this.body = "";
+        }
+
+        this.body = line.trim();
     }
 
     private void parseQueryStringParams(String queryString) {
         Map<String, String> parsedQueryString = HttpRequestUtils.parseQueryString(queryString);
         if(parsedQueryString != null)
             this.params.putAll(parsedQueryString);
+    }
+
+    public String getMethodType() {
+        return methodType;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
+    public String getBody() {
+        return body;
     }
 }

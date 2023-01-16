@@ -36,17 +36,17 @@ public class RequestController {
     private static RequestController controller = null;
 
     public static HttpResponse requestController(InputStream in) throws IOException {
-        HttpRequest requestParser = new HttpRequest(in);
-        String path = requestParser.path;
+        HttpRequest request = new HttpRequest(in);
+        String path = request.getPath();
 
         logger.debug("Request Path: " + path);
 
         String[] args = path.split("\\.");
 
         if(args.length >= STATIC)  // .min.js, .js, .html , .ico
-            return staticResourceController(requestParser.path);
+            return staticResourceController(request.getPath());
         else
-            return dynamicResourceController(requestParser.path, requestParser);
+            return dynamicResourceController(request.getPath(), request);
 
     }
 
