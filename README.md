@@ -8,21 +8,21 @@ Java Web Application Server 2022
 를 참고하여 작성되었습니다.
 ----
 ## HTTP 프로토콜
-![fetching_a_page.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F78%2F7rd3pfkj75g6fz0ny8j9znh40000gn%2FT%2Fme.damir.dropover-mac%2FPromises%2F3355443203%2Ffetching_a_page.png)
-
+![w301.png](ReadmeImg%2Fw301.png)
 웹에서 통용되는 데이터 교환의 근간이 되는 **클라이언트** - **서버** 프로토콜이다.
 
-![w3-1.gif](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F78%2F7rd3pfkj75g6fz0ny8j9znh40000gn%2FT%2Fme.damir.dropover-mac%2FPromises%2F3690987523%2Fw3-1.gif)
+![w3-1.gif](ReadmeImg%2Fw3-1.gif)
 
 클라이언트로부터 웹 서버로 전달된 메시지는 Request, 웹 서버에서 클라이언트의 요구를 처리해 다시 클라이언트로 반환하는 메시지는 Response로 불린다.
 
 ### HTTP Request / Response
-![w302.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F78%2F7rd3pfkj75g6fz0ny8j9znh40000gn%2FT%2Fme.damir.dropover-mac%2FPromises%2F3623878659%2Fw302.png)
+![w302.png](ReadmeImg%2Fw302.png)
 
 HTTP 프로토콜을 이용한 원활한 데이터 교환을 위해 각 HTTP request / response 메시지를 이용해 요청 자원의 기술과 반환할 자원, 및 결과의 상태 코드를 반환한다.
 
 ### HTTP Request
-![w303.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F78%2F7rd3pfkj75g6fz0ny8j9znh40000gn%2FT%2Fme.damir.dropover-mac%2FPromises%2F3825205251%2Fw303.png)
+![w303.png](ReadmeImg%2Fw303.png)
+
 HTTP 요청의 첫 줄은 Request Line으로, 
 
 Request Line : **HTTP 메서드**, **path**, **HTTP 버전**
@@ -33,7 +33,7 @@ Request Line : **HTTP 메서드**, **path**, **HTTP 버전**
 * **HTTP 버전** : 사용하는 프로토콜의 버전
 
 ### HTTP Response
-![w304.png](..%2F..%2F..%2F..%2F..%2Fvar%2Ffolders%2F78%2F7rd3pfkj75g6fz0ny8j9znh40000gn%2FT%2Fme.damir.dropover-mac%2FPromises%2F3892314115%2Fw304.png)
+![w304.png](ReadmeImg%2Fw304.png)
 
 Content-Type 헤더: 리스폰스 body가 데이터의 타입
 * Request의 Accept 헤더에 대응되며 Http Response body 내용의 타입을 설명하는 헤더

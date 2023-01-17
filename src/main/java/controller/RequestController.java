@@ -4,8 +4,10 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utility.HttpRequestParser;
+import service.UserService;
+import dto.HttpRequest;
 import dto.HttpResponse;
+import utility.HttpRequestUtils;
 import utility.HttpStatusCode;
 
 import java.io.IOException;
@@ -13,7 +15,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class RequestController {
     /*
@@ -36,17 +37,17 @@ public class RequestController {
     private static RequestController controller = null;
 
     public static HttpResponse requestController(InputStream in) throws IOException {
-        HttpRequestParser requestParser = new HttpRequestParser(in);
-        String path = requestParser.path;
+        HttpRequest request = new HttpRequest(in);
+        String path = request.getPath();
 
         logger.debug("Request Path: " + path);
 
         String[] args = path.split("\\.");
 
         if(args.length >= STATIC)  // .min.js, .js, .html , .ico
-            return staticResourceController(requestParser.path);
+            return staticResourceController(request.getPath());
         else
-            return dynamicResourceController(requestParser.path, requestParser);
+            return dynamicResourceController(request.getPath(), request);
 
     }
 
@@ -66,7 +67,7 @@ public class RequestController {
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static HttpResponse dynamicResourceController(String path, HttpRequestParser parser) throws IOException {
+    public static HttpResponse dynamicResourceController(String path, HttpRequest parser) throws IOException {
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";
@@ -76,8 +77,16 @@ public class RequestController {
             status = HttpStatusCode.OK;
         }
 
-        if(path.equals("/user/create") && parser.hasParams()) {
-            Map<String, String> params = parser.getParams();
+        if(path.equals("/user/create") && (parser.hasParams() || !parser.getBody().isEmpty())) {
+            Map<String, String> params = null;
+
+            if(!parser.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(parser.getBody());
+
+            if(parser.hasParams())
+                params = parser.getQueryString();
+
+            Objects.requireNonNull(params);
 
             User user = User.UserBuilder.builder()
                     .setUserId(params.get("userId"))
@@ -85,14 +94,18 @@ public class RequestController {
                     .setName(params.get("name"))
                     .setEmail(params.get("email")).build();
 
-            // TODO: UserService로 분리
-            Database.addUser(user);
-
-            logger.debug("created User: {}", Database.findUserById(params.get("userId")));
-
             path = "";
             status = HttpStatusCode.FOUND;
             header.put("Location", "/index.html");
+
+            try {
+                UserService.signUpUser(user);
+            } catch (IllegalStateException e) {
+                logger.error("/user/create - " + e.getMessage());
+                header.put("Location", "/user/form.html");
+            }
+
+            logger.debug("created User: {}", Database.findUserById(params.get("userId")));
         }
 
         if(!path.isBlank())
