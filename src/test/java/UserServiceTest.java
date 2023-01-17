@@ -1,8 +1,12 @@
 import db.Database;
+import dto.SessionCookie;
 import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.SessionService;
 import service.UserService;
+
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -52,5 +56,18 @@ public class UserServiceTest {
         assertThat(UserService.findUserById(user1.getUserId()))
                 .isInstanceOf(User.class)
                 .isEqualTo(user1);
+    }
+
+    @Test
+    public void Given_ExistingUser_When_LoginUser_Then_Success() {
+        // given
+        User existingUser = new User.UserBuilder().setUserId("a").setPassword("a").build();
+        UserService.signUpUser(existingUser);
+
+        // when
+        boolean loginSuccess = UserService.loginUser("a", "a");
+
+        // then
+        assertThat(loginSuccess).isTrue();
     }
 }
