@@ -32,9 +32,6 @@ public class RequestController {
 
     private static final List<String> staticResource = new ArrayList<>(Arrays.asList("js", "html", "css", "font", "woff"));
 
-    public Map<String, Integer> resources;
-
-    private static RequestController controller = null;
 
     public static HttpResponse requestController(InputStream in) throws IOException {
         HttpRequest request = new HttpRequest(in);
@@ -67,7 +64,7 @@ public class RequestController {
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static HttpResponse dynamicResourceController(String path, HttpRequest parser) throws IOException {
+    public static HttpResponse dynamicResourceController(String path, HttpRequest request) throws IOException {
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";
@@ -77,14 +74,14 @@ public class RequestController {
             status = HttpStatusCode.OK;
         }
 
-        if(path.equals("/user/create") && (parser.hasParams() || !parser.getBody().isEmpty())) {
+        if(path.equals("/user/create") && (request.hasParams() || !request.getBody().isEmpty())) {
             Map<String, String> params = null;
 
-            if(!parser.getBody().isBlank())
-                params = HttpRequestUtils.parseQueryString(parser.getBody());
+            if(!request.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(request.getBody());
 
-            if(parser.hasParams())
-                params = parser.getQueryString();
+            if(request.hasParams())
+                params = request.getQueryString();
 
             Objects.requireNonNull(params);
 
