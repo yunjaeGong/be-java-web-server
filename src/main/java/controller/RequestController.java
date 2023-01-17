@@ -1,9 +1,11 @@
 package controller;
 
 import db.Database;
+import dto.SessionCookie;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.SessionService;
 import service.UserService;
 import dto.HttpRequest;
 import dto.HttpResponse;
@@ -103,6 +105,40 @@ public class RequestController {
             }
 
             logger.debug("created User: {}", Database.findUserById(params.get("userId")));
+        }
+
+        if(path.equals("/user/login")) {
+            boolean loginSuccess = false;
+            Map<String, String> params = null;
+
+            if(!request.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(request.getBody());
+
+            if(request.hasParams())
+                params = request.getQueryString();
+
+            Objects.requireNonNull(params);
+
+            path = "";
+            status = HttpStatusCode.FOUND;
+
+            try {
+                loginSuccess = UserService.loginUser(params.get("userId"), params.get("password"));
+                header.put("Location", "/index.html");
+
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                logger.error("/user/login - " + e.getMessage());
+                header.put("Location", "/user/login_fail.html");
+            }
+
+            if(loginSuccess) {
+                // Session을 Cookie로 저장
+                SessionCookie session = SessionService.createSession(params.get("name"), Map.of());
+                header.put("Set-Cookie", session.toString());
+                logger.debug("/user/login - " + session);
+            }
+
+            logger.debug("Login User: {}" + params.get("userId"));
         }
 
         if(!path.isBlank())
