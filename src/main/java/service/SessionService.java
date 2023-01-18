@@ -3,7 +3,6 @@ package service;
 import db.SessionDatabase;
 import dto.Session;
 import dto.SessionCookie;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +14,12 @@ public class SessionService {
 
     private static final Map<String, String> options = new HashMap<>();
 
-    public static SessionCookie createSession(String username, Map<String, String> options) throws IllegalStateException {
+    public static SessionCookie createSession(String userId, Map<String, String> options) throws IllegalStateException {
         SessionService.resetOptions();
 
         SessionService.options.putAll(options);
 
-        SessionCookie session = new SessionCookie(username, Map.copyOf(SessionService.options));
-
-        return session;
+        return new SessionCookie(userId, Map.copyOf(SessionService.options));
     }
 
     public static Session findSessionBySID(String sid) {
