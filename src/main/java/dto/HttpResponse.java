@@ -15,12 +15,12 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
     public final HttpStatusCode statusCode;
-    public String contentType;
+    public final String contentType;
     public final String resourcePath;
 
     private Map<String, String> header;
-            
-    public HttpResponse(String resourcePath, HttpStatusCode statusCode, Map<String, String> header, String contentType) {
+
+    public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType, Map<String, String> header) {
         this.statusCode = statusCode;
         this.resourcePath = resourcePath;
         this.header = header;
@@ -28,7 +28,7 @@ public class HttpResponse {
     }
 
     public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType) {
-        this(resourcePath, statusCode, new HashMap<>(), contentType);
+        this(resourcePath, statusCode, contentType, new HashMap<>());
     }
 
     public DataOutputStream of(DataOutputStream dos) throws IOException {
