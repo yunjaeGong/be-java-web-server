@@ -10,7 +10,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class TemplateServiceTest {
 
     @Test
-    public void Given_StringToReplace_When_replaceString_ThenReplace() throws IOException {
+    public void Given_StringToReplace_When_replaceWithString_ThenReplace() throws IOException {
         String body = Files.readString(new File("src/main/resources/templates/index.html").toPath());
 
         StringBuilder sb = new StringBuilder(body);
