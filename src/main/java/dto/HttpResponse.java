@@ -98,6 +98,10 @@ public class HttpResponse {
         }
 
         public HttpResponse build() {
+            if(header == null)
+                header = Map.of();
+            if(generatedPage == null)
+                generatedPage = new StringBuilder();
             return new HttpResponse(resourcePath, statusCode, contentType, header, generatedPage);
         }
     }
