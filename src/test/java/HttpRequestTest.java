@@ -132,8 +132,8 @@ public class HttpRequestTest {
 
         HttpResponse response = new HttpResponse("",
                 HttpStatusCode.FOUND,
-                Map.ofEntries(entry("Location", "/index.html")),
-                "text/html");
+                "text/html", Map.ofEntries(entry("Location", "/index.html"))
+        );
 
         try {
             UserService.signUpUser(user);
