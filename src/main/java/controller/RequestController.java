@@ -46,7 +46,7 @@ public class RequestController {
         if(args.length >= STATIC)  // .min.js, .js, .html , .ico
             return staticResourceController(request);
         else
-            return dynamicResourceController(request.getPath(), request);
+            return dynamicResourceController(request);
 
     }
 
@@ -67,10 +67,11 @@ public class RequestController {
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static HttpResponse dynamicResourceController(String path, HttpRequest request) throws IOException {
+    public static HttpResponse dynamicResourceController(HttpRequest request) throws IOException {
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";
+        String path = request.getPath();
 
         if(path.equals("/")) {
             path = "/index.html";
