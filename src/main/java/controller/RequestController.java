@@ -44,14 +44,15 @@ public class RequestController {
         String[] args = path.split("\\.");
 
         if(args.length >= STATIC)  // .min.js, .js, .html , .ico
-            return staticResourceController(request.getPath());
+            return staticResourceController(request);
         else
             return dynamicResourceController(request.getPath(), request);
 
     }
 
-    public static HttpResponse staticResourceController(String path) throws IOException {
+    public static HttpResponse staticResourceController(HttpRequest request) throws IOException {
         StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
+        String path = request.getPath();
 
         if(path.contains("html") || path.contains(".ico")) {
             resourcePath.append(TEMPLATES_PATH);
