@@ -53,4 +53,26 @@ public class UserServiceTest {
                 .isInstanceOf(User.class)
                 .isEqualTo(user1);
     }
+
+    @Test
+    public void Given_ExistingUser_When_LoginUser_Then_Success() {
+        // given
+        User existingUser = new User.UserBuilder().setUserId("a").setPassword("a").build();
+        UserService.signUpUser(existingUser);
+
+        // when
+        boolean loginSuccess = UserService.loginUser("a", "a");
+
+        // then
+        assertThat(loginSuccess).isTrue();
+    }
+
+    @Test
+    public void Given_NonExistingUser_When_LoginUser_Then_Fail() {
+        // given, when
+        assertThatThrownBy(() -> UserService.loginUser("a", "a"))
+                .isInstanceOf(IllegalArgumentException.class)
+                // then
+                .hasMessageContaining("해당 유저가 존재하지 않습니다.");
+    }
 }
