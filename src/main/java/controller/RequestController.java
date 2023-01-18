@@ -1,9 +1,11 @@
 package controller;
 
 import db.Database;
+import dto.SessionCookie;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import service.SessionService;
 import service.UserService;
 import dto.HttpRequest;
 import dto.HttpResponse;
@@ -32,9 +34,6 @@ public class RequestController {
 
     private static final List<String> staticResource = new ArrayList<>(Arrays.asList("js", "html", "css", "font", "woff"));
 
-    public Map<String, Integer> resources;
-
-    private static RequestController controller = null;
 
     public static HttpResponse requestController(InputStream in) throws IOException {
         HttpRequest request = new HttpRequest(in);
@@ -67,7 +66,7 @@ public class RequestController {
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
 
-    public static HttpResponse dynamicResourceController(String path, HttpRequest parser) throws IOException {
+    public static HttpResponse dynamicResourceController(String path, HttpRequest request) throws IOException {
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";
@@ -77,14 +76,14 @@ public class RequestController {
             status = HttpStatusCode.OK;
         }
 
-        if(path.equals("/user/create") && (parser.hasParams() || !parser.getBody().isEmpty())) {
+        if(path.equals("/user/create") && (request.hasParams() || !request.getBody().isEmpty())) {
             Map<String, String> params = null;
 
-            if(!parser.getBody().isBlank())
-                params = HttpRequestUtils.parseQueryString(parser.getBody());
+            if(!request.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(request.getBody());
 
-            if(parser.hasParams())
-                params = parser.getQueryString();
+            if(request.hasParams())
+                params = request.getQueryString();
 
             Objects.requireNonNull(params);
 
@@ -106,6 +105,40 @@ public class RequestController {
             }
 
             logger.debug("created User: {}", Database.findUserById(params.get("userId")));
+        }
+
+        if(path.equals("/user/login")) {
+            boolean loginSuccess = false;
+            Map<String, String> params = null;
+
+            if(!request.getBody().isBlank())
+                params = HttpRequestUtils.parseQueryString(request.getBody());
+
+            if(request.hasParams())
+                params = request.getQueryString();
+
+            Objects.requireNonNull(params);
+
+            path = "";
+            status = HttpStatusCode.FOUND;
+
+            try {
+                loginSuccess = UserService.loginUser(params.get("userId"), params.get("password"));
+                header.put("Location", "/index.html");
+
+            } catch (IllegalStateException | IllegalArgumentException e) {
+                logger.error("/user/login - " + e.getMessage());
+                header.put("Location", "/user/login_fail.html");
+            }
+
+            if(loginSuccess) {
+                // Session을 Cookie로 저장
+                SessionCookie session = SessionService.createSession(params.get("name"), Map.of());
+                header.put("Set-Cookie", session.toString());
+                logger.debug("/user/login - " + session);
+            }
+
+            logger.debug("Login User: {}" + params.get("userId"));
         }
 
         if(!path.isBlank())

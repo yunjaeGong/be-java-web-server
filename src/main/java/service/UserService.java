@@ -20,7 +20,13 @@ public class UserService {
         Database.addUser(user);
     }
 
-    public static User findUserById(String userId) {
+    public static boolean loginUser(String userId, String password) {
+        return UserService.findUserById(userId)
+                .getPassword()
+                .equals(password);
+    }
+
+    public static User findUserById(String userId) throws IllegalArgumentException {
         return Database.findUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
     }
