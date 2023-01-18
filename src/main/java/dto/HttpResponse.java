@@ -17,7 +17,7 @@ public class HttpResponse {
     public final HttpStatusCode statusCode;
     public final String contentType;
     public final String resourcePath;
-
+    private StringBuilder generatedPage;
     private Map<String, String> header;
 
     public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType, Map<String, String> header) {
@@ -29,6 +29,11 @@ public class HttpResponse {
 
     public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType) {
         this(resourcePath, statusCode, contentType, new HashMap<>());
+    }
+
+    public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType, Map<String, String> header, StringBuilder generatedPage) {
+        this(resourcePath, statusCode, contentType, header);
+        this.generatedPage = generatedPage;
     }
 
     public DataOutputStream of(DataOutputStream dos) throws IOException {
@@ -58,5 +63,42 @@ public class HttpResponse {
         dos.write(body, 0, body.length);
 
         return dos;
+    }
+
+    public static class HttpResponseBuilder {
+        private HttpStatusCode statusCode;
+        private String contentType;
+        private String resourcePath;
+        private StringBuilder generatedPage;
+        private Map<String, String> header;
+
+        public HttpResponseBuilder setStatusCode(HttpStatusCode statusCode) {
+            this.statusCode = statusCode;
+            return this;
+        }
+
+        public HttpResponseBuilder setContentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public HttpResponseBuilder setResourcePath(String resourcePath) {
+            this.resourcePath = resourcePath;
+            return this;
+        }
+
+        public HttpResponseBuilder setGeneratedPage(StringBuilder generatedPage) {
+            this.generatedPage = generatedPage;
+            return this;
+        }
+
+        public HttpResponseBuilder setHeader(Map<String, String> header) {
+            this.header = header;
+            return this;
+        }
+
+        public HttpResponse build() {
+            return new HttpResponse(resourcePath, statusCode, contentType, header, generatedPage);
+        }
     }
 }
