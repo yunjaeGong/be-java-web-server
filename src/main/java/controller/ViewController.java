@@ -65,13 +65,13 @@ public class ViewController {
 
         logger.debug("user - userList");
 
-
-        String path = request.getPath();
+        String path = DEFAULT_PATH + request.getPath();
+        String contentType = Files.probeContentType(Path.of(path));
 
         String sid = SessionService.extractSidFromCookie(request);
 
         List<User> users = null;
-        if(sid != null && sid.isBlank()) {
+        if(sid != null && !sid.isBlank()) {
             try {
                 Session s = SessionService.findSessionBySID(sid);
                 users = UserService.findAllUsers();
@@ -81,12 +81,10 @@ public class ViewController {
                 logger.error(e.getMessage());
             }
         }
-        // TODO: user 리스트가 들어간 페이지 생성
-        // generatePageWithGivenString(DEFAULT_PATH + path, "", String.format("<li><a role=\"button\">%s</a></li>", ""));
 
-        logger.debug("contentType: " +"text/html");
+        logger.debug("contentType: {}", contentType);
 
-        return new HttpResponse("", status, "text/html", header);
+        return new HttpResponse(path, status, contentType, Map.of(), generatedPage);
     }
 
     private StringBuilder generatePageWithGivenString(String templatePath, String toReplace, String given) throws IOException {
