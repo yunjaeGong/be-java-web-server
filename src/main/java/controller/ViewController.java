@@ -60,6 +60,7 @@ public class ViewController {
 
     @ControllerMapping(method = HttpMethodType.GET, path = "/user/list.html")
     public HttpResponse userList(HttpRequest request) throws IOException {
+        StringBuilder generatedPage = new StringBuilder();
         Map<String, String> header = new HashMap<>();
         HttpStatusCode status = HttpStatusCode.INTERNAL_ERROR;
 
@@ -75,7 +76,21 @@ public class ViewController {
             try {
                 Session s = SessionService.findSessionBySID(sid);
                 users = UserService.findAllUsers();
+                StringBuilder sb = new StringBuilder();
 
+                for(int i=1;i<=users.size();++i) {
+                    User user = users.get(i-1);
+                    String listItem =
+                            String.format("<th scope=\"row\">%d</th> <td>%s</td> <td>%s</td> <td>%s</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>",
+                                    i, user.getUserId(), user.getName(), user.getEmail());
+
+                    sb.append("<tr>");
+                    sb.append(listItem);
+                    sb.append("        </tr>");
+                }
+
+                generatedPage = generatePageWithGivenString(path, "<!-- %forEach% -->", sb.toString());
+                path = "";
                 status = HttpStatusCode.OK;
             } catch (IllegalArgumentException e) {
                 logger.error(e.getMessage());
