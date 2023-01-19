@@ -25,6 +25,7 @@ public class HttpResponse {
         this.resourcePath = resourcePath;
         this.header = header;
         this.contentType = contentType;  // TODO: contentType = null일 때 e.g., woff 예외처리 필요
+        this.generatedPage = new StringBuilder();
     }
 
     public HttpResponse(String resourcePath, HttpStatusCode statusCode, String contentType) {
@@ -45,6 +46,11 @@ public class HttpResponse {
             } catch (IOException e) {
                 logger.error("cannot open file: " + e.getMessage());
             }
+        }
+
+        if(generatedPage.length() != 0) {
+            logger.debug("동적 html");
+            body = this.generatedPage.toString().getBytes();
         }
 
         dos.writeBytes(String.format("%s %s \r\n", "HTTP/1.1", statusCode.toString()));
