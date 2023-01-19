@@ -30,12 +30,13 @@ public class ViewController {
     public HttpResponse index(HttpRequest request) throws IOException {
         StringBuilder generatedPage = new StringBuilder();
 
-        String path = request.getPath();
+        String path = DEFAULT_PATH + request.getPath();
         String contentType = Files.probeContentType(Path.of(path));
 
         String sid = SessionService.extractSidFromCookie(request);
+        logger.debug("/index.html, with SessionId: {}", sid);
 
-        if(sid != null && sid.isBlank()) {
+        if(sid != null && !sid.isBlank()) {
             logger.debug(sid);
             User user = null;
 
@@ -45,14 +46,11 @@ public class ViewController {
             } catch (IllegalArgumentException e) {
                 logger.error(e.getMessage());
             }
-
-            generatedPage = generatePageWithGivenString(DEFAULT_PATH + path,
-                    "로그인", String.format("<li><a role=\"button\">%s</a></li>", user.getName()));
         }
 
         logger.debug("contentType: " +contentType);
 
-        return new HttpResponse("", HttpStatusCode.OK, contentType, Map.of(), generatedPage);
+        return new HttpResponse(path, HttpStatusCode.OK, contentType, Map.of(), generatedPage);
     }
 
     @ControllerMapping(method = HttpMethodType.GET, path = "/user/list.html")
