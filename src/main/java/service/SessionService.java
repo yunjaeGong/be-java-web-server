@@ -19,7 +19,10 @@ public class SessionService {
 
         SessionService.options.putAll(options);
 
-        return new SessionCookie(userId, Map.copyOf(SessionService.options));
+        SessionCookie s = new SessionCookie(userId, Map.copyOf(SessionService.options));
+        SessionDatabase.addSession(s);
+
+        return s;
     }
 
     public static Session findSessionBySID(String sid) {
