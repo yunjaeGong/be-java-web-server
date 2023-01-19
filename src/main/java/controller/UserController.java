@@ -88,7 +88,7 @@ public class UserController {
 
         } catch (IllegalStateException | IllegalArgumentException e) {
             logger.error("/user/login - " + e.getMessage());
-            header.put("Location", "/user/login_fail.html");
+            header.put("Location", "/user/login_failed.html");
         }
 
         if(loginSuccess) {
