@@ -1,6 +1,7 @@
 package service;
 
 import db.SessionDatabase;
+import dto.HttpRequest;
 import dto.Session;
 import dto.SessionCookie;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class SessionService {
     private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
@@ -33,5 +35,27 @@ public class SessionService {
     private static void resetOptions() {
         options.clear();
         options.put("path", "/");
+    }
+
+    public static String extractSidFromCookie(HttpRequest request) {
+        Map<String, String> requestHeader = request.getRequestHeader();
+
+        if(requestHeader.containsKey("Cookie")) {
+            String sid = requestHeader.get("Cookie");
+            sid = Stream.of(sid.split(" "))
+                    .map(String::trim)
+                    .filter((str) -> str.contains("sid="))
+                    .findFirst().orElse("");
+
+            if(sid.charAt(sid.length()-1) == ';') {
+                sid = sid.substring(0, sid.length()-1);
+            }
+
+            if(!sid.isBlank()) {
+                sid = sid.split("=")[1];
+                return sid;
+            }
+        }
+        return null;
     }
 }
