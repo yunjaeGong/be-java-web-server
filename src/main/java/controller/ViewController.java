@@ -43,6 +43,11 @@ public class ViewController {
             try {
                 Session s = SessionService.findSessionBySID(sid);
                 user = UserService.findUserById(s.getUserId());
+                generatedPage = generatePageWithGivenString(path,
+                        "로그인", String.format("<li><a role=\"button\">%s</a></li>", user.getName()));
+                path = "";
+
+                logger.debug("/index.html, userFound: {}", user.toString());
             } catch (IllegalArgumentException e) {
                 logger.error(e.getMessage());
             }
