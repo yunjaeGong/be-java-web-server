@@ -1,6 +1,7 @@
 package controller;
 
 import db.Database;
+import dto.Session;
 import dto.SessionCookie;
 import model.User;
 import org.slf4j.Logger;
@@ -12,11 +13,11 @@ import dto.HttpResponse;
 import utility.HttpRequestUtils;
 import utility.HttpStatusCode;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class RequestController {
     /*
@@ -53,15 +54,57 @@ public class RequestController {
     public static HttpResponse staticResourceController(HttpRequest request) throws IOException {
         StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
         String path = request.getPath();
+        String contentType = Files.probeContentType(Path.of(path));
 
         if(path.contains("html") || path.contains(".ico")) {
             resourcePath.append(TEMPLATES_PATH);
+
+            // index.html
+            // session cookie 유무 검사
+            if(request.getRequestHeader().containsKey("Cookie")) {
+                String sid = request.getRequestHeader().get("Cookie");
+                sid = Stream.of(sid.split(" ")).map(String::trim).filter((str) -> str.contains("sid=")).findFirst().orElse("");
+                if(sid.charAt(sid.length()-1) == ';')
+                    sid = sid.substring(0, sid.length()-1);
+
+                if(!sid.isBlank()) {
+                    sid = sid.split("=")[1];
+                    logger.debug(sid);
+                    User user = null;
+                    resourcePath.append(path);
+
+                    try {
+                        Session s = SessionService.findSessionBySID(sid);
+                        user = UserService.findUserById(s.getUserId());
+
+                    } catch (IllegalArgumentException e) {
+                        logger.error(e.getMessage());
+                    }
+
+                    String curLine = "";
+                    BufferedReader br = new BufferedReader(new FileReader(resourcePath.toString()));
+                    StringBuilder sb = new StringBuilder();
+
+                    while ((curLine = br.readLine()) != null) {
+                        if(curLine.contains("로그인"))
+                            sb.append(String.format("<li><a role=\"button\">%s</a></li>", user.getName()));
+                        else
+                            sb.append(curLine);
+                    }
+
+                    return new HttpResponse.HttpResponseBuilder()
+                            .setResourcePath("")
+                            .setStatusCode(HttpStatusCode.OK)
+                            .setContentType(contentType)
+                            .setGeneratedPage(sb).build();
+                }
+            }
+
         } else {
             resourcePath.append(STATIC_PATH);
         }
         resourcePath.append(path);
 
-        String contentType = Files.probeContentType(Path.of(path));
         logger.debug("contentType: " +contentType);
 
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
@@ -147,6 +190,6 @@ public class RequestController {
             contentType = Files.probeContentType(Path.of(path));
         logger.debug("contentType: " +contentType);
 
-        return new HttpResponse(path, status, header, contentType);
+        return new HttpResponse(path, status, contentType, header);
     }
 }
