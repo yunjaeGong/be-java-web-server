@@ -98,7 +98,7 @@ public class UserController {
             logger.debug("/user/login - " + session);
         }
 
-        logger.debug("Login User: {}" + params.get("userId"));
+        logger.debug("Login User: {}", params.get("userId"));
 
         if(!path.isBlank())
             contentType = Files.probeContentType(Path.of(path));
