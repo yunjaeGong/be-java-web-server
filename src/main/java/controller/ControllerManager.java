@@ -41,8 +41,6 @@ public class ControllerManager {
         String path = request.getPath();
         String contentType = Files.probeContentType(Path.of(path));
 
-        boolean ifStaticResource = false;
-
         for(Class con : controllers) {
             List<Method> methods = Arrays.stream(con.getMethods()).filter(m -> m.isAnnotationPresent(ControllerMapping.class)).collect(Collectors.toList());
             Method method = null;
