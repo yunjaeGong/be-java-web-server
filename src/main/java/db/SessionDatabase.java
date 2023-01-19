@@ -15,6 +15,10 @@ public class SessionDatabase {
         return Optional.ofNullable(sessions.get(sid));
     }
 
+    public static void addSession(Session s) {
+        sessions.put(s.getSessionId(), s);
+    }
+
     public static Optional<Collection<Session>> findAll() {
         return Optional.of(sessions.values());
     }
