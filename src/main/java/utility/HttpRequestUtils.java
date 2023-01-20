@@ -2,6 +2,8 @@ package utility;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,7 +21,8 @@ public class HttpRequestUtils {
         if(params.length == 0 || params[0].isBlank())
             return null;
 
-        return Stream.of(params).map((param) -> param.split("=")).collect(Collectors.toMap(a->a[0], a->a[1]));
+        return Stream.of(params).map((param) -> param.split("="))
+                .collect(Collectors.toMap(a->a[0], a-> URLDecoder.decode(a[1], StandardCharsets.UTF_8)));
     }
 
     public static Map<String, String> parseRequestHeader(BufferedReader request) throws IOException {

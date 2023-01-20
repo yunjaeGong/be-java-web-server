@@ -98,6 +98,10 @@ public class HttpRequest {
         return body;
     }
 
+    public Map<String, String> getRequestHeader() {
+        return new HashMap<>(this.requestHeader);
+    }
+
     public Map<String, String> getQueryString() {
         return new HashMap<>(this.queryString);
     }
