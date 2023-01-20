@@ -5,7 +5,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import java.util.*;
 
 
 public class UserService {
@@ -29,5 +29,15 @@ public class UserService {
     public static User findUserById(String userId) throws IllegalArgumentException {
         return Database.findUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다."));
+    }
+
+    public static List<User> findAllUsers() {
+        Optional<Collection<User>> users = Database.findAll();
+        if(users.isPresent()) {
+            return new ArrayList<>(users.get());
+        }
+        else {
+            return Collections.emptyList();
+        }
     }
 }
