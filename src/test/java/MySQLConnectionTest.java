@@ -67,12 +67,12 @@ public class MySQLConnectionTest {
         PreparedStatement pstmt = null;
 
         try {
-            String sql = "DELETE FROM users WHERE userId=?";
-
+            String sql = "TRUNCATE users";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, "gildong");
-            pstmt.executeQuery();
-        } catch (Exception e) {
+
+            pstmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
