@@ -51,7 +51,7 @@ public class UserServiceTest {
         // then
         assertThat(UserService.findUserById(user1.getUserId()))
                 .isInstanceOf(User.class)
-                .isEqualTo(user1);
+                .isEqualToComparingFieldByField(user1);
     }
 
     @Test
