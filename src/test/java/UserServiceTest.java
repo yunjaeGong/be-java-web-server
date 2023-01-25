@@ -1,4 +1,4 @@
-import db.Database;
+import db.UserDatabase;
 import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,7 @@ public class UserServiceTest {
 
     @BeforeEach
     private void cleanUpDatabase() {
-        Database.clear();
+        UserDatabase.clear();
     }
 
     @Test

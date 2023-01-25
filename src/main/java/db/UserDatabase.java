@@ -1,7 +1,5 @@
 package db;
 
-import com.google.common.collect.Maps;
-
 import model.User;
 
 import java.util.Collection;
@@ -9,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class Database {
+public class UserDatabase {
     private static Map<String, User> users = new HashMap<>();
 
     public static void addUser(User user) {
