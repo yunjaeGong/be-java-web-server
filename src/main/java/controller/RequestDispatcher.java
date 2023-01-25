@@ -38,12 +38,12 @@ public class RequestDispatcher {
     }
 
     public static HttpResponse fulfillRequest(HttpRequest request) throws IOException {
-        // 정적 리소스 처리 시도 후, 파일을 찾을 수 없으면 동적 리소스 처리 시도
-        try {
+        HttpResponse response = handleDynamicResource(request);
+
+        if(response.statusCode == HttpStatusCode.NOT_FOUND)
             return handleStaticResource(request);
-        } catch (IOException e) {
-            return handleDynamicResource(request);
-        }
+
+        return response;
     }
 
     private static HttpResponse handleDynamicResource(HttpRequest request) {
@@ -85,7 +85,10 @@ public class RequestDispatcher {
         }
         resourcePath.append(path);
 
-        logger.debug("contentType: " +contentType);
+        logger.debug("resourcePath: " + resourcePath.toString());
+        if(!new File(resourcePath.toString()).isFile()) {
+            return NOT_FOUND_RESPONSE;
+        }
 
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
     }
