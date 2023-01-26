@@ -1,29 +1,82 @@
 package db;
 
 import dto.Session;
+import service.DBConnection;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.*;
+import java.util.*;
 
 public class SessionDatabase {
-
-    private static Map<String, Session> sessions = new HashMap<>();
-
+    private static final Connection con = DBConnection.getInstance();
     public static Optional<Session> findSessionBySid(String sid) {
-        return Optional.ofNullable(sessions.get(sid));
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        Session session;
+
+        try {
+            String sql = "SELECT * FROM sessions";
+            pstmt = con.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            session = new Session(rs.getString("sessionId"),
+                    rs.getString("userId"),
+                    rs.getString("userName"),
+                    rs.getTimestamp("createDate").toLocalDateTime());
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.ofNullable(session);
     }
 
     public static void addSession(Session s) {
-        sessions.put(s.getSessionId(), s);
+        PreparedStatement pstmt = null;
+        try {
+            String sql = "INSERT INTO sessions VALUES (?, ?, ?, ?)";
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, s.getSessionId());
+            pstmt.setString(2, s.getUserId());
+            pstmt.setString(3, s.getUserName());
+            pstmt.setTimestamp(4, Timestamp.valueOf(s.getCreateDate()));
+
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Optional<Collection<Session>> findAll() {
-        return Optional.of(sessions.values());
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        List<Session> sessions = new ArrayList<>();
+
+        try {
+            String sql = "SELECT * FROM sessions";
+            pstmt = con.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+
+            sessions.add(new Session(rs.getString("sessionId"),
+                    rs.getString("userId"),
+                    rs.getString("userName"),
+                    rs.getTimestamp("createDate").toLocalDateTime())
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return Optional.of(sessions);
     }
 
     public static void clear() {
-        sessions = new HashMap<>();
+        PreparedStatement pstmt = null;
+
+        try {
+            String sql = "TRUNCATE sessions";
+            pstmt = con.prepareStatement(sql);
+
+            pstmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
