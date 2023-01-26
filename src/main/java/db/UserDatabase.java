@@ -67,12 +67,15 @@ public class UserDatabase {
 
             result = pstmt.executeQuery();
 
-            User user = User.UserBuilder.builder()
-                    .setUserId(result.getString("userId"))
-                    .setName(result.getString("name"))
-                    .setEmail(result.getString("email"))
-                    .build();
-            users.add(user);
+            while(result != null && result.next()) {
+                User user = User.UserBuilder.builder()
+                        .setUserId(result.getString("userId"))
+                        .setName(result.getString("name"))
+                        .setEmail(result.getString("email"))
+                        .build();
+                users.add(user);
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
