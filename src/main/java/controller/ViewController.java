@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class ViewController {
     // 동적 html을 반환해야 하는 html의 경우
@@ -44,7 +43,7 @@ public class ViewController {
                 Session s = SessionService.findSessionBySID(sid);
                 user = UserService.findUserById(s.getUserId());
                 generatedPage = generatePageWithGivenString(path,
-                        "로그인", String.format("<li><a role=\"button\">%s</a></li>", user.getName()));
+                        "로그인", String.format("<li><a role=\"button\">%s</a></li>", user.getUsername()));
                 path = "";
 
                 logger.debug("/index.html, userFound: {}", user.toString());
@@ -82,7 +81,7 @@ public class ViewController {
                     User user = users.get(i-1);
                     String listItem =
                             String.format("<th scope=\"row\">%d</th> <td>%s</td> <td>%s</td> <td>%s</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>",
-                                    i, user.getUserId(), user.getName(), user.getEmail());
+                                    i, user.getUserId(), user.getUsername(), user.getEmail());
 
                     sb.append("<tr>");
                     sb.append(listItem);
