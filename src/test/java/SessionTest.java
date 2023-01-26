@@ -1,10 +1,9 @@
-import db.Database;
+import db.UserDatabase;
 import dto.SessionCookie;
 import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.SessionService;
-import service.UserService;
 
 import java.util.Map;
 
@@ -14,7 +13,7 @@ public class SessionTest {
 
     @BeforeEach
     private void clearUserDatabase() {
-        Database.clear();
+        UserDatabase.clear();
     }
 
     @Test

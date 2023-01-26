@@ -14,16 +14,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Map.entry;
 
-public class ControllerManager {
-    private static final Logger logger = LoggerFactory.getLogger(ControllerManager.class);
+public class RequestDispatcher {
+    private static final Logger logger = LoggerFactory.getLogger(RequestDispatcher.class);
 
     public static final String DEFAULT_PATH = "./src/main/resources";
     public static final String TEMPLATES_PATH = "/templates";
     public static final String STATIC_PATH = "/static";
+
+    private static final HttpResponse NOT_FOUND_RESPONSE = new HttpResponse("/", HttpStatusCode.NOT_FOUND, "text/plain");
 
     private static Map<Class<?>, Object> instance;
     private static List<Class<?>> controllers;
@@ -36,13 +37,23 @@ public class ControllerManager {
         controllers = List.of(UserController.class, ViewController.class);
     }
 
-    public static HttpResponse matchController(HttpRequest request) throws IOException {
-        StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
-        String path = request.getPath();
-        String contentType = Files.probeContentType(Path.of(path));
+    public static HttpResponse fulfillRequest(HttpRequest request) throws IOException {
+        HttpResponse response = handleDynamicResource(request);
 
-        for(Class con : controllers) {
-            List<Method> methods = Arrays.stream(con.getMethods()).filter(m -> m.isAnnotationPresent(ControllerMapping.class)).collect(Collectors.toList());
+        if(response.statusCode == HttpStatusCode.NOT_FOUND)
+            return handleStaticResource(request);
+
+        return response;
+    }
+
+    private static HttpResponse handleDynamicResource(HttpRequest request) {
+        HttpResponse response = NOT_FOUND_RESPONSE;
+
+        for(Class<?> con : controllers) {
+            List<Method> methods = Arrays.stream(con.getMethods())
+                    .filter(m -> m.isAnnotationPresent(ControllerMapping.class))
+                    .collect(Collectors.toList());
+
             Method method = null;
 
             method = methods.stream().filter((m) -> ifMatchController(m, request)).findFirst().orElse(null);
@@ -52,14 +63,19 @@ public class ControllerManager {
 
             try {
                 Object controllerInstance = instance.get(con);
-                return (HttpResponse) method.invoke(controllerInstance, request);
-            } catch (IllegalArgumentException | IllegalAccessException | NullPointerException e) {
+                response = (HttpResponse) method.invoke(controllerInstance, request);
+            } catch (IllegalArgumentException | IllegalAccessException | NullPointerException |
+                     InvocationTargetException e) {
                 logger.error(e.getMessage());
-            } catch (InvocationTargetException e) {
-                logger.error(e.getMessage());
-
             }
         }
+        return response;
+    }
+
+    private static HttpResponse handleStaticResource(HttpRequest request) throws IOException {
+        StringBuilder resourcePath = new StringBuilder(DEFAULT_PATH);
+        String path = request.getPath();
+        String contentType = Files.probeContentType(Path.of(path));
 
         if(path.contains("html") || path.contains(".ico")) {
             resourcePath.append(TEMPLATES_PATH);
@@ -69,10 +85,12 @@ public class ControllerManager {
         }
         resourcePath.append(path);
 
-        logger.debug("contentType: " +contentType);
+        logger.debug("resourcePath: " + resourcePath.toString());
+        if(!new File(resourcePath.toString()).isFile()) {
+            return NOT_FOUND_RESPONSE;
+        }
 
         return new HttpResponse(resourcePath.toString(), HttpStatusCode.OK, contentType);
-
     }
 
     private static boolean ifMatchController(Method method, HttpRequest req) {

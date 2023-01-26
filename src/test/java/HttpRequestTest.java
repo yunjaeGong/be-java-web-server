@@ -1,4 +1,4 @@
-import db.Database;
+import db.UserDatabase;
 import dto.HttpResponse;
 import model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +28,7 @@ public class HttpRequestTest {
 
     @BeforeEach
     private void cleanUpDatabase() {
-        Database.clear();
+        UserDatabase.clear();
     }
 
     @Test
@@ -103,7 +103,7 @@ public class HttpRequestTest {
         // then
         assertLinesMatch(result,expected);
 
-        assertTrue(Database.findUserById("javajigi").isPresent());
+        assertTrue(UserDatabase.findUserById("javajigi").isPresent());
     }
 
     @Test

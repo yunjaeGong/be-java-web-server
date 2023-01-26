@@ -1,6 +1,6 @@
 package controller;
 
-import db.Database;
+import db.UserDatabase;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import dto.SessionCookie;
@@ -54,7 +54,7 @@ public class UserController {
             header.put("Location", "/user/form.html");
         }
 
-        logger.debug("created User: {}", Database.findUserById(params.get("userId")));
+        logger.debug("created User: {}", UserDatabase.findUserById(params.get("userId")));
 
         if(!path.isBlank())
             contentType = Files.probeContentType(Path.of(path));
