@@ -6,14 +6,16 @@ import java.util.UUID;
 import static java.time.LocalTime.now;
 
 public class Session {
-    protected final LocalTime createDate;
     protected String sessionId;
+    protected final LocalTime createDate;
     protected String userId;
+    protected String userName;
 
-    protected Session(String userId) {
+    protected Session(String userId, String userName) {
+        this.sessionId = String.valueOf(UUID.randomUUID());
         this.userId = userId;
+        this.userName = userName;
         this.createDate = now();
-        sessionId = String.valueOf(UUID.randomUUID());
     }
 
     public String getSessionId() {
