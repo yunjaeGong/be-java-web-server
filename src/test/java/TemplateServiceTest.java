@@ -1,63 +1,64 @@
+import dto.Comment;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.TemplateService;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static service.TemplateService.regeneratePageWithGivenString;
 
 public class TemplateServiceTest {
 
     @Test
-    public void Given_StringToFind_When_findTag_ThenSuccess() throws IOException {
-        String body = Files.readString(new File("src/main/resources/templates/index.html").toPath());
+    @DisplayName("생성된 페이지에서 toReplace String을 찾고, given 스트링으로 바꾸는 메서드 테스트")
+    public void regeneratePageTest() throws IOException {
+        SoftAssertions softly = new SoftAssertions();
 
-        StringBuilder sb = new StringBuilder(body);
-
-        int idx = TemplateService.findTag(sb, "<!DOCTYPE", 1);
-        assertThat(sb.indexOf("<!DOCTYPE", idx)).isZero();
-    }
-
-    @Test
-    public void Given_StringToFind_When_findSecondTag_ThenSuccess() throws IOException {
         // given
-        String body = Files.readString(new File("src/main/resources/templates/index.html").toPath());
-        StringBuilder sb = new StringBuilder(body);
+        final StringBuilder template = new StringBuilder();
+        BufferedReader br = new BufferedReader(new FileReader("src/main/resources/templates/index.html"));
+        String line = "";
+
+        while ((line = br.readLine()) != null) {
+            template.append(line);
+        }
+
+        List<Comment> comments = List.of(new Comment(1, "gildong", "gildong", LocalDateTime.now()),
+                new Comment(2, "hong", "hong", LocalDateTime.now()));
 
         // when
-        int idx = TemplateService.findTag(sb, "로그인", 2);
+        regeneratePageWithGivenString(template, "로그인", "홍길동");
+        StringBuilder sb = new StringBuilder();
 
-        // then
-        int expectedIdx = sb.indexOf("로그인", 0);
-        expectedIdx = sb.indexOf("로그인", expectedIdx);
+        for (int i = 1; i <= comments.size(); ++i) {
+            Comment comment = comments.get(i - 1);
+            String item = String.format(
+                    "                        <th scope=\"row\"><span class=\"time\">%s</span></th>\n" +
+                            "                        <td class=\"auth-info\">\n" +
+                            "\n" +
+                            "                            <a href=\"./user/profile.html\" class=\"author\">%s</a>\n" +
+                            "                        </td>\n" +
+                            "                        <td class=\"body\">\n" +
+                            "                            <span>%s</span>\n" +
+                            "                        </td>\n", comment.getCreateDate(), comment.getUserName(), comment.getBody());
 
-        assertThat(idx).isEqualTo(expectedIdx);
-    }
+            sb.append("<tr>");
+            sb.append(item);
+            sb.append("        </tr>");
+        }
+
+        regeneratePageWithGivenString(template, "<!-- %comment% -->", sb.toString());
 
 
-    @Test
-    public void Given_StringToReplace_When_replaceWithString_ThenReplace() throws IOException {
-        String body = Files.readString(new File("src/main/resources/templates/index.html").toPath());
-
-        StringBuilder sb = new StringBuilder(body);
-
-
-        TemplateService.replaceWithString(sb, "로그인", "홍길동동동동동동");
-        assertThat(sb.indexOf("홍길동동동동동동")).isNotNegative();
-    }
-
-    @Test
-    public void Given_StringToReplace_When_replaceStringWithTags_ThenReplace() throws IOException {
-        String body = Files.readString(new File("src/main/resources/templates/user/list.html").toPath());
-
-        StringBuilder sb = new StringBuilder(body);
-        int openingIdx = TemplateService.findTag(sb, "<tbody>", 1);
-        int closingIdx = TemplateService.findTag(sb, "</tbody>", 1);
-        String toReplace = "<tr>\n" +
-                "                    <th scope=\"row\">1</th> <td>javajigi</td> <td>자바지기</td> <td>javajigi@sample.net</td><td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>\n" +
-                "                </tr>";
-        TemplateService.replaceTag(sb, toReplace, openingIdx, closingIdx-openingIdx, "<tbody>");
-        System.out.println(sb);
+        softly.assertThat(template.toString()).doesNotContain("<!-- %comment% -->").doesNotContain("로그인");
     }
 }
