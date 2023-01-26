@@ -2,7 +2,6 @@ import dto.Comment;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import service.TemplateService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,9 +12,19 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static service.TemplateService.createTemplate;
 import static service.TemplateService.replaceStringWithGivenString;
 
 public class TemplateServiceTest {
+
+    @Test
+    @DisplayName("정적 페이지와 동일한 내용으로 동적 템플릿 생성이 되는지 테스트")
+    public void generatePage() {
+        SoftAssertions softly = new SoftAssertions();
+        // given
+        StringBuilder template = createTemplate("src/main/resources/templates/index.html");
+        softly.assertThat(template).isEqualTo(new File("src/main/resources/templates/index.html").toString());
+    }
 
     @Test
     @DisplayName("생성된 페이지에서 toReplace String을 찾고, given 스트링으로 바꾸는 메서드 테스트")
