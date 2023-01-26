@@ -23,7 +23,7 @@ public class SessionTest {
         // UserService.signUpUser(existingUser);
 
         // when
-        SessionCookie session = SessionService.createSession(existingUser.getUserId(), Map.of());
+        SessionCookie session = SessionService.createSession(existingUser.getUserId(), existingUser.getUsername(), Map.of());
 
         assertThat(session.toString());
 
