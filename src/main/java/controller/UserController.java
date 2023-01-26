@@ -69,8 +69,6 @@ public class UserController {
         HttpStatusCode status = HttpStatusCode.NOT_FOUND;
         String contentType = "text/html";
 
-        logger.debug("user - loginUser");
-
         boolean loginSuccess = false;
         Map<String, String> params = null;
 
