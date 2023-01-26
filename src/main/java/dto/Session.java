@@ -1,13 +1,11 @@
 package dto;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
-
-import static java.time.LocalTime.now;
 
 public class Session {
     protected String sessionId;
-    protected final LocalTime createDate;
+    protected final LocalDateTime createDate;
     protected String userId;
     protected String userName;
 
@@ -15,7 +13,13 @@ public class Session {
         this.sessionId = String.valueOf(UUID.randomUUID());
         this.userId = userId;
         this.userName = userName;
-        this.createDate = now();
+        this.createDate = LocalDateTime.now();
+    }
+    public Session(String sessionId, String userId, String userName, LocalDateTime createDate) {
+        this.sessionId = sessionId;
+        this.userId = userId;
+        this.userName = userName;
+        this.createDate = createDate;
     }
 
     public String getSessionId() {
@@ -24,5 +28,13 @@ public class Session {
 
     public String getUserId() {
         return userId;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 }
