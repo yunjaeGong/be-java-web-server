@@ -15,6 +15,7 @@ public class Comment {
 
     public Comment(int commentId, String body, String userId, String userName, LocalDateTime createDate) {
         this.commentId = commentId;
+        this.body = body;
         this.userId = userId;
         this.userName = userName;
         this.createDate = createDate;
