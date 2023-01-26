@@ -56,7 +56,7 @@ public class UserDatabase {
         return Optional.ofNullable(user);
     }
 
-    public static Optional<Collection<User>> findAll() {
+    public static Optional<Collection<User>> getAll() {
         PreparedStatement pstmt = null;
         ResultSet result = null;
         List<User> users = new ArrayList<>();
