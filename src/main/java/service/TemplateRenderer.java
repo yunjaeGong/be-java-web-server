@@ -7,16 +7,17 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class TemplateService {
+public class TemplateRenderer {
     /*
     1. 템플릿 읽기
     2. 주어진 태그 위치 찾기
     3. 위치에 쓰기
      */
-    private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateRenderer.class);
+    private final StringBuilder template;
 
-    public static StringBuilder createTemplate(String templatePath) {
-        StringBuilder template = new StringBuilder();
+    public TemplateRenderer(String templatePath) {
+        this.template = new StringBuilder();
 
         try {
             String curLine = "";
@@ -28,15 +29,18 @@ public class TemplateService {
         } catch(IOException e) {
             logger.error("cannot open file {}", e.getMessage());
         }
-
-        return template;
     }
 
-    public static StringBuilder replaceStringWithGivenString(StringBuilder template, String toReplace, String given) throws IOException {
+    public StringBuilder replaceStringWithGivenString(String toReplace, String given) throws IOException {
         int startIdx = template.indexOf(toReplace);
-        template.replace(startIdx, startIdx+toReplace.length(), "");
-        template.insert(startIdx, given);
+        this.template.replace(startIdx, startIdx+toReplace.length(), "");
+        this.template.insert(startIdx, given);
 
-        return template;
+        return this.template;
+    }
+
+    @Override
+    public String toString() {
+        return template.toString();
     }
 }
