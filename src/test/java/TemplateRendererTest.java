@@ -15,7 +15,7 @@ public class TemplateRendererTest {
 
     @Test
     @DisplayName("정적 페이지와 동일한 내용으로 동적 템플릿 생성이 되는지 테스트")
-    public void generatePage() {
+    public void generatePage() throws IOException {
         SoftAssertions softly = new SoftAssertions();
         // given
         TemplateRenderer template = new TemplateRenderer("src/main/resources/templates/index.html");
