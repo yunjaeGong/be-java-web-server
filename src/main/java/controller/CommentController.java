@@ -31,7 +31,7 @@ public class CommentController {
         User user = null;
 
         if(!request.getBody().isBlank())
-            body = request.getBody();
+            body = HttpRequestUtils.parseQueryString(request.getBody()).get("contents");
 
         logger.debug("/comment/write body: {}", body);
 
