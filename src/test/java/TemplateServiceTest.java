@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static service.TemplateService.regeneratePageWithGivenString;
+import static service.TemplateService.replaceStringWithGivenString;
 
 public class TemplateServiceTest {
 
@@ -36,7 +35,7 @@ public class TemplateServiceTest {
                 new Comment(2, "hong", "hong", LocalDateTime.now()));
 
         // when
-        regeneratePageWithGivenString(template, "로그인", "홍길동");
+        replaceStringWithGivenString(template, "로그인", "홍길동");
         StringBuilder sb = new StringBuilder();
 
         for (int i = 1; i <= comments.size(); ++i) {
@@ -56,7 +55,7 @@ public class TemplateServiceTest {
             sb.append("        </tr>");
         }
 
-        regeneratePageWithGivenString(template, "<!-- %comment% -->", sb.toString());
+        replaceStringWithGivenString(template, "<!-- %comment% -->", sb.toString());
 
 
         softly.assertThat(template.toString()).doesNotContain("<!-- %comment% -->").doesNotContain("로그인");
