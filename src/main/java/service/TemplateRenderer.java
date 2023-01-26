@@ -16,7 +16,7 @@ public class TemplateRenderer {
     private static final Logger logger = LoggerFactory.getLogger(TemplateRenderer.class);
     private final StringBuilder template;
 
-    public TemplateRenderer(String templatePath) {
+    public TemplateRenderer(String templatePath) throws IOException {
         this.template = new StringBuilder();
 
         try {
@@ -28,6 +28,7 @@ public class TemplateRenderer {
             }
         } catch(IOException e) {
             logger.error("cannot open file {}", e.getMessage());
+            throw new IOException(e);
         }
     }
 
