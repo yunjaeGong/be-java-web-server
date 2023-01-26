@@ -1,8 +1,11 @@
 package service;
 
-import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class TemplateService {
     /*
@@ -10,28 +13,30 @@ public class TemplateService {
     2. 주어진 태그 위치 찾기
     3. 위치에 쓰기
      */
+    private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
 
-    public static int findTag(StringBuilder sb, String tag, int pos) {
-        int startingIdx = 0;
-        int tagIdx = 0;
+    public static StringBuilder createTemplate(String templatePath) {
+        StringBuilder template = new StringBuilder();
 
-        for (int tries = 1; startingIdx < sb.length() && tries <= pos; tries++) {
-            tagIdx = sb.indexOf(tag, startingIdx);
-            startingIdx = tagIdx;
+        try {
+            String curLine = "";
+            BufferedReader br = new BufferedReader(new FileReader(templatePath));
+
+            while ((curLine = br.readLine()) != null) {
+                template.append(curLine);
+            }
+        } catch(IOException e) {
+            logger.error("cannot open file {}", e.getMessage());
         }
 
-        return tagIdx;
+        return template;
     }
 
-    public static void replaceTag(StringBuilder sb, String with, int openingIdx, int len, String tag) {
-        sb.replace(openingIdx + tag.length(), openingIdx + len, "");
-        sb.insert(openingIdx + tag.length(), with);
-    }
+    public static StringBuilder replaceStringWithGivenString(StringBuilder template, String toReplace, String given) throws IOException {
+        int startIdx = template.indexOf(toReplace);
+        template.replace(startIdx, startIdx+toReplace.length(), "");
+        template.insert(startIdx, given);
 
-    public static void replaceWithString(StringBuilder sb, String toReplace, String with) {
-        int idx = findTag(sb, toReplace, 0);
-        sb.replace(idx, idx + toReplace.length(), "");
-        sb.insert(idx, with);
+        return template;
     }
-
 }
