@@ -93,7 +93,7 @@ public class UserController {
 
         if(loginSuccess) {
             // Session을 Cookie로 저장
-            SessionCookie session = SessionService.createSession(params.get("userId"), Map.of());
+            SessionCookie session = SessionService.createSession(params.get("userId"), params.get("name"), Map.of());
             header.put("Set-Cookie", session.toString());
             logger.debug("/user/login - " + session);
         }
