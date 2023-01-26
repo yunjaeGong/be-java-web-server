@@ -1,24 +1,32 @@
 package db;
 
 import dto.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import service.DBConnection;
 
 import java.sql.*;
 import java.util.*;
 
 public class SessionDatabase {
+    private static final Logger logger = LoggerFactory.getLogger(SessionDatabase.class);
     private static final Connection con = DBConnection.getInstance();
+
     public static Optional<Session> findSessionBySid(String sid) {
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         Session session;
 
         try {
-            String sql = "SELECT * FROM sessions";
+            String sql = "SELECT * FROM sessions where sid = ?";
             pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, sid);
             rs = pstmt.executeQuery();
 
-            session = new Session(rs.getString("sessionId"),
+            if(rs == null || !rs.next())
+                return Optional.empty();
+
+            session = new Session(rs.getString("sid"),
                     rs.getString("userId"),
                     rs.getString("userName"),
                     rs.getTimestamp("createDate").toLocalDateTime());
@@ -26,7 +34,7 @@ public class SessionDatabase {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return Optional.ofNullable(session);
+        return Optional.of(session);
     }
 
     public static void addSession(Session s) {
