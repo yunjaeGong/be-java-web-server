@@ -2,28 +2,24 @@ import dto.Comment;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import service.TemplateRenderer;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import static service.TemplateService.createTemplate;
-import static service.TemplateService.replaceStringWithGivenString;
-
-public class TemplateServiceTest {
+public class TemplateRendererTest {
 
     @Test
     @DisplayName("정적 페이지와 동일한 내용으로 동적 템플릿 생성이 되는지 테스트")
     public void generatePage() {
         SoftAssertions softly = new SoftAssertions();
         // given
-        StringBuilder template = createTemplate("src/main/resources/templates/index.html");
-        softly.assertThat(template).isEqualTo(new File("src/main/resources/templates/index.html").toString());
+        TemplateRenderer template = new TemplateRenderer("src/main/resources/templates/index.html");
+        softly.assertThat(template.toString()).isEqualTo(new File("src/main/resources/templates/index.html").toString());
     }
 
     @Test
@@ -32,19 +28,15 @@ public class TemplateServiceTest {
         SoftAssertions softly = new SoftAssertions();
 
         // given
-        final StringBuilder template = new StringBuilder();
+        TemplateRenderer template = new TemplateRenderer("src/main/resources/templates/index.html");
         BufferedReader br = new BufferedReader(new FileReader("src/main/resources/templates/index.html"));
         String line = "";
-
-        while ((line = br.readLine()) != null) {
-            template.append(line);
-        }
 
         List<Comment> comments = List.of(new Comment(1, "gildong", "gildong", LocalDateTime.now()),
                 new Comment(2, "hong", "hong", LocalDateTime.now()));
 
         // when
-        replaceStringWithGivenString(template, "로그인", "홍길동");
+        template.replaceStringWithGivenString("로그인", "홍길동");
         StringBuilder sb = new StringBuilder();
 
         for (int i = 1; i <= comments.size(); ++i) {
@@ -64,8 +56,7 @@ public class TemplateServiceTest {
             sb.append("        </tr>");
         }
 
-        replaceStringWithGivenString(template, "<!-- %comment% -->", sb.toString());
-
+        template.replaceStringWithGivenString("<!-- %comment% -->", sb.toString());
 
         softly.assertThat(template.toString()).doesNotContain("<!-- %comment% -->").doesNotContain("로그인");
     }
