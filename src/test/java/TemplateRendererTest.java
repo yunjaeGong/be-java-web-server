@@ -32,8 +32,8 @@ public class TemplateRendererTest {
         BufferedReader br = new BufferedReader(new FileReader("src/main/resources/templates/index.html"));
         String line = "";
 
-        List<Comment> comments = List.of(new Comment(1, "gildong", "gildong", LocalDateTime.now()),
-                new Comment(2, "hong", "hong", LocalDateTime.now()));
+        List<Comment> comments = List.of(new Comment(1, "Hello", "gildong", "gildong", LocalDateTime.now()),
+                new Comment(2, "World!", "hong", "hong", LocalDateTime.now()));
 
         // when
         template.replaceStringWithGivenString("로그인", "홍길동");
