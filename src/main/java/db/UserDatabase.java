@@ -10,10 +10,6 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class UserDatabase {
-    private static Map<String, User> users = new HashMap<>();
-    private static final String FindUser = "SELECT * FROM users WHERE userId=?";
-    private static final String FindAllUsers = "SELECT * FROM users";
-
     private static final Connection con = DBConnection.getInstance();
 
     public static void addUser(User user) {
