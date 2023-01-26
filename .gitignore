@@ -15,6 +15,9 @@
 # AWS User-specific
 .idea/**/aws.xml
 
+# Credentials
+/src/main/resources/credentials.xml
+
 # Generated files
 .idea/**/contentModel.xml
 

@@ -3,7 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import controller.ControllerManager;
+import controller.RequestDispatcher;
 import dto.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             HttpRequest request = new HttpRequest(in);
-            HttpResponse response = ControllerManager.matchController(request);
+            HttpResponse response = RequestDispatcher.fulfillRequest(request);
             dos = response.of(dos);
 
             dos.flush();
